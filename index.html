@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Korean Trainer PRO+ (Ultimate 3D Focus)</title>
+<title>Korean Trainer PRO+ (Balanced Font Size)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
@@ -131,16 +131,18 @@
     .progress-wrap { background: #E2E8F0; height: 16px; border-radius: 20px; overflow: hidden; margin-top: 15px; border: inset 2px #CBD5E1;}
     .bar { background: linear-gradient(90deg, #F59E0B, #FCD34D); height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 20px;}
     
+    /* MÀU SẮC ĐẶC TRƯNG */
+    .text-kr { color: #1E3A8A !important; font-weight: 900 !important; } 
+    .text-vi { color: #047857 !important; font-weight: 800 !important; } 
+
+    /* FLASHCARD TỈ LỆ VÀNG (Cỡ chữ 55px vừa vặn) */
     .flash-container { text-align: center; min-height: 320px; display: flex; flex-direction: column; justify-content: center; background: #FFFFFF; border-radius: 28px; padding: 40px; margin: 20px 0; position: relative; border: 3px solid var(--border); border-bottom: 10px solid var(--border-bottom); }
     .flash-counter { position: absolute; top: 20px; left: 20px; font-size: 18px; color: var(--primary); font-weight: 800; background: #EFF6FF; padding: 8px 18px; border-radius: 16px; border: 2px solid #BFDBFE;}
-    .flash-word { font-size: 80px; font-weight: 900; margin-bottom: 10px; color: var(--text-focus); letter-spacing: -2px;}
-    .flash-pr { font-size: 26px; color: var(--text-muted); font-style: italic; margin-bottom: 25px; font-weight: 600;}
-    .flash-vi { font-size: 38px; color: var(--success); font-weight: 900; }
+    .flash-word { font-size: 55px !important; font-weight: 900; margin-bottom: 15px; line-height: 1.2; word-wrap: break-word;}
+    .flash-pr { font-size: 24px; color: var(--text-muted); font-style: italic; margin-bottom: 25px; font-weight: 600;}
+    .flash-vi { font-size: 32px !important; }
     
-    /* MÀU SẮC ĐẶC TRƯNG CHO TỪNG NGÔN NGỮ (TĂNG SỰ TẬP TRUNG) */
-    .text-kr { color: #1E3A8A !important; font-weight: 900 !important; font-size: 110%; } /* Xanh Navy cho tiếng Hàn */
-    .text-vi { color: #047857 !important; font-weight: 800 !important; } /* Xanh Ngọc cho tiếng Việt */
-
+    /* GAME TRẮC NGHIỆM */
     .quiz-title { font-size: 45px; text-align: center; margin: 30px 0 40px 0; font-weight: 900; }
     .quiz-title .pr-text { display: block; font-size: 24px; color: var(--text-muted) !important; font-weight: 600 !important; margin-top: 8px; font-style: italic; }
     .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 850px; margin: 0 auto;}
@@ -151,7 +153,6 @@
         border-radius: 20px; 
         cursor: pointer; 
         text-align: center; 
-        font-size: 26px; 
         border: 3px solid var(--border); 
         border-bottom: 8px solid var(--border-bottom);
         transition: all 0.1s; 
@@ -161,6 +162,9 @@
         align-items: center; 
         min-height: 120px;
     }
+    .quiz-option.text-kr { font-size: 30px !important; } 
+    .quiz-option.text-vi { font-size: 24px !important; } 
+    
     .quiz-option:hover { 
         border-color: var(--primary); 
         background: #EFF6FF; 
@@ -172,6 +176,7 @@
     }
     .quiz-option .pr-text { font-size: 18px; color: var(--text-muted) !important; font-weight: 600 !important; margin-top: 5px; font-style: italic; }
     
+    /* GAME GHÉP CẶP */
     .match-container { display: flex; justify-content: center; align-items: center; padding: 20px 0; }
     .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 900px; }
     .match-box { 
@@ -180,7 +185,6 @@
         border-radius: 18px; 
         text-align: center; 
         cursor: pointer; 
-        font-size: 24px; 
         border: 3px solid var(--border); 
         border-bottom: 8px solid var(--border-bottom);
         transition: all 0.1s; 
@@ -189,6 +193,9 @@
         justify-content: center; 
         min-height: 100px;
     }
+    .match-box.text-kr { font-size: 26px !important; } 
+    .match-box.text-vi { font-size: 22px !important; } 
+
     .match-box:hover { background: #EFF6FF; border-color: var(--primary); }
     .match-box:active { border-bottom-width: 3px; transform: translateY(5px); margin-bottom: 5px;}
     .match-box.selected { 
@@ -199,19 +206,22 @@
     }
     .match-box.hidden { visibility: hidden; opacity: 0; pointer-events: none;}
     
+    /* Ô NHẬP LIỆU */
     .ai-write-container { padding: 10px; width: 100%; box-sizing: border-box;}
-    .ai-target-word { font-size: 55px; color: var(--primary); font-weight: 900; margin: 15px 0 5px 0; text-align: center;}
-    .ai-target-vi { font-size: 24px; color: var(--text-muted); font-weight: 700; margin-bottom: 30px; text-align: center;}
+    .ai-target-word { font-size: 45px !important; color: var(--primary); font-weight: 900; margin: 15px 0 5px 0; text-align: center;}
+    .ai-target-vi { font-size: 22px !important; color: var(--text-muted); font-weight: 700; margin-bottom: 30px; text-align: center;}
     .ai-custom-input, .ai-textarea { width: 100%; padding: 22px; font-size: 22px; border-radius: 16px; border: 3px solid var(--border); background: #F8FAFC; outline: none; box-sizing: border-box; margin-bottom: 20px; font-family: inherit; font-weight: 700; color: var(--text-focus); transition: all 0.2s;}
     .ai-custom-input:focus, .ai-textarea:focus { border-color: var(--primary); background: #FFFFFF; box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.2); }
     .ai-textarea { height: 160px; resize: vertical; }
     
+    /* BẢNG AI ĐÁNH GIÁ */
     .ai-result-box { margin-top: 35px; padding: 30px 35px; background: #FFFFFF; border-radius: 20px; text-align: left; font-size: 20px; line-height: 1.8; display: none; border: 3px solid var(--border); border-bottom: 8px solid var(--border-bottom); color: var(--text);}
     .ai-result-box strong, .ai-result-box b { font-weight: 800;}
     
     .loader { border: 4px solid #E5E7EB; border-top: 4px solid white; border-radius: 50%; width: 22px; height: 22px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px;}
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
+    /* BÀN PHÍM ẢO 3D */
     #keyboard-wrap { position: fixed; bottom: 0; left: 0; width: 100%; background: #E2E8F0; padding: 20px 10px; box-sizing: border-box; z-index: 1000; display: none; border-top: 4px solid var(--border); box-shadow: 0 -10px 30px rgba(0,0,0,0.15);}
     #keyboard-wrap.show { display: block; animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
     .keyboard-close-btn { position: absolute; top: -65px; right: 20px; background: #FFFFFF; color: var(--text-focus); border: 2px solid var(--border); border-bottom: 5px solid var(--border-bottom); padding: 12px 25px; border-radius: 14px; font-weight: 800; font-size: 18px; cursor: pointer;}
@@ -397,7 +407,6 @@
 </main>
 
 <script>
-// Hệ thống âm thanh Bloop mượt mà
 function playSuccessSound() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -418,7 +427,6 @@ let vocabSets = []; let activeSetIds = []; let vocab = [];
 let index = 0, exp = 0, level = 1, selected = null; let currentAIWord = null; let editingSetId = null; let listenIndex = 0; 
 let quizStartTime; let quizTimerInterval; let currentQuizType = 'quiz_kr_vi';
 
-// QUAN TRỌNG: Mảng lưu trữ các từ "Đã Thuộc" để không cộng điểm 2 lần
 let learnedWords = [];
 
 let keyboard; let activeVirtualInput = null; let isKeyboardShift = false;
@@ -460,7 +468,6 @@ initDatabase();
 function saveProgress() { localforage.setItem("expData", {exp, level}); }
 function saveLearned() { localforage.setItem("learnedWords", learnedWords); }
 
-// Hàm xóa toàn bộ dữ liệu cày cuốc
 function resetProgress() {
     if(confirm("Bạn có chắc chắn muốn xóa toàn bộ Level, EXP và Danh sách từ đã thuộc?")) {
         exp = 0; level = 1; learnedWords = [];
@@ -505,13 +512,12 @@ function checkListen() {
     if(!ans) return showToast("Bạn chưa nhập đáp án", "error"); 
     
     let correctWord = vocab[listenIndex]; 
-    let wordId = correctWord.kr; // Dùng từ tiếng Hàn làm ID mốc
+    let wordId = correctWord.kr; 
 
     if(ans === correctWord.kr) { 
         resBox.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check"></i> Chính xác: ${correctWord.vi}</span>`; 
         playSuccessSound(); 
         
-        // KIỂM TRA ĐÃ THUỘC CHƯA MỚI CỘNG ĐIỂM
         if (!learnedWords.includes(wordId)) {
             gain(15); 
             learnedWords.push(wordId);
@@ -611,14 +617,12 @@ function startQuiz(type = 'quiz_kr_vi') {
     while(opts.length < 4) { let r = vocab[Math.floor(Math.random() * vocab.length)]; if(!opts.includes(r)) opts.push(r); } 
     opts.sort(() => Math.random() - 0.5); 
     
-    // Gán class màu sắc cho tiêu đề
     let titleClass = type === 'quiz_kr_vi' ? 'text-kr' : 'text-vi';
     let optClass = type === 'quiz_kr_vi' ? 'text-vi' : 'text-kr';
 
     let html = `<div class="quiz-title ${titleClass}">${type === 'quiz_kr_vi' ? `${q.kr} ${q.pr ? `<span class="pr-text">[${q.pr}]</span>` : ''}` : q.vi}</div><div class="quiz-grid">`; 
     opts.forEach(o => {
         let optText = type === 'quiz_kr_vi' ? o.vi : `${o.kr} ${o.pr ? `<span class="pr-text">[${o.pr}]</span>` : ''}`;
-        // Gán class màu sắc cho đáp án và truyền thêm ID từ để lưu tiến độ
         html += `<div class='quiz-option ${optClass}' onclick='checkQuiz(this,"${btoa(encodeURIComponent(type === 'quiz_kr_vi' ? o.vi : o.kr))}","${btoa(encodeURIComponent(type === 'quiz_kr_vi' ? q.vi : q.kr))}", "${encodeURIComponent(q.kr)}")'>${optText}</div>`;
     }); 
     document.getElementById('quizBox').innerHTML = html + `</div>`; 
@@ -633,7 +637,6 @@ function checkQuiz(e, s, c, encodedId) {
         e.style.background = "#D1FAE5"; e.style.borderColor = "#10B981"; e.style.borderBottomColor = "#047857"; 
         playSuccessSound();
         
-        // KIỂM TRA ĐÃ THUỘC CHƯA
         if (!learnedWords.includes(wordId)) {
             gain(10); 
             learnedWords.push(wordId);
@@ -657,7 +660,6 @@ function startMatchGame() {
     mC = 0; let m = document.getElementById('matchBox'); m.innerHTML = ""; 
     let p = [...vocab].sort(() => Math.random() - 0.5).slice(0, 3); 
     
-    // Gán cờ ngôn ngữ để tô màu
     let a = [
         ...p.map(v => ({t: v.kr, id: v.kr, lang: 'text-kr'})), 
         ...p.map(v => ({t: v.vi, id: v.kr, lang: 'text-vi'}))
@@ -665,7 +667,7 @@ function startMatchGame() {
     
     a.forEach(x => { 
         let d = document.createElement("div"); 
-        d.className = `match-box ${x.lang}`; // Tô màu xanh navy cho Hàn, Xanh ngọc cho Việt
+        d.className = `match-box ${x.lang}`; 
         d.innerText = x.t; 
         d.onclick = () => pM(d, x.id); 
         m.appendChild(d); 
@@ -684,7 +686,6 @@ function pM(d, id) {
             
             playSuccessSound(); 
 
-            // KIỂM TRA ĐÃ THUỘC CHƯA
             if (!learnedWords.includes(id)) {
                 gain(15); 
                 learnedWords.push(id);
