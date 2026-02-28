@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Korean Trainer PRO+ (Typing Feature)</title>
+<title>Korean Trainer PRO+ (Typing Mastery)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
@@ -439,8 +439,10 @@ let learnedWords = [];
 
 // Các biến cho tính năng Luyện Gõ Từ
 let typeIndex = 0;
+let typeQueue = []; // Bể chứa 2N câu hỏi
 let currentTypeAns = "";
 let currentTypeLang = "";
+let currentTypeWordId = "";
 
 let keyboard; let activeVirtualInput = null; let isKeyboardShift = false;
 document.addEventListener("DOMContentLoaded", () => {
@@ -502,7 +504,7 @@ function renderSetsList() {
     });
 }
 function toggleSet(id) { if(activeSetIds.includes(id)) activeSetIds=activeSetIds.filter(x=>x!==id); else activeSetIds.push(id); updateCombinedVocab(true); }
-function updateCombinedVocab(save = true) { vocab=[]; vocabSets.forEach(s=>{ if(activeSetIds.includes(s.id)) vocab=vocab.concat(s.data); }); if(save) localforage.setItem("activeSetIds", activeSetIds); renderSetsList(); document.getElementById('libraryCard').classList.remove('hide'); listenIndex = 0; typeIndex = 0; }
+function updateCombinedVocab(save = true) { vocab=[]; vocabSets.forEach(s=>{ if(activeSetIds.includes(s.id)) vocab=vocab.concat(s.data); }); if(save) localforage.setItem("activeSetIds", activeSetIds); renderSetsList(); document.getElementById('libraryCard').classList.remove('hide'); listenIndex = 0; typeQueue = []; }
 function deleteSet(id, e) { e.stopPropagation(); if(confirm("Xóa bài học này?")){ vocabSets=vocabSets.filter(s=>s.id!==id); localforage.setItem("vocabSets", vocabSets); activeSetIds=activeSetIds.filter(x=>x!==id); updateCombinedVocab(true); } }
 
 function openCreateModal() { editingSetId = null; document.getElementById('modalTitle').innerHTML = 'Tạo Bài Mới'; document.getElementById('editSetName').value = ""; document.getElementById('editSetWords').innerHTML = ""; addNewEditRow(); addNewEditRow(); document.getElementById('editModal').classList.remove('hide'); }
@@ -518,17 +520,34 @@ function back() { document.querySelectorAll('main > div:not(#toast):not(#keyboar
 function updateExpUI() { document.getElementById('level').innerText=level; document.getElementById('exp').innerText=exp; document.getElementById('bar').style.width=exp+"%"; }
 function gain(x) { exp+=x; if(exp>=100){exp-=100; level++; showToast(`Lên cấp ${level}!`); playSuccessSound();} updateExpUI(); saveProgress(); }
 
-// --- TÍNH NĂNG LUYỆN GÕ TỪ MỚI THÊM VÀO ---
+// --- HỆ THỐNG LUYỆN GÕ TỪ (HỎI ĐỦ 2 CHIỀU) ---
+function buildTypeQueue() {
+    typeQueue = [];
+    vocab.forEach(w => {
+        typeQueue.push({ word: w, isViToKr: true });  // Câu Việt -> Hàn
+        typeQueue.push({ word: w, isViToKr: false }); // Câu Hàn -> Việt
+    });
+    // Trộn ngẫu nhiên thứ tự các câu hỏi
+    typeQueue.sort(() => Math.random() - 0.5);
+    typeIndex = 0;
+}
+
 function startTypeGame() {
     if(vocab.length === 0) return;
-    if(typeIndex >= vocab.length) typeIndex = 0;
     
-    document.getElementById('typeCounterText').innerText = `${typeIndex + 1}/${vocab.length}`;
+    // Nếu chưa tạo bể câu hỏi hoặc đã làm hết thì tạo lại
+    if(typeQueue.length === 0 || typeIndex >= typeQueue.length) {
+        buildTypeQueue();
+    }
+    
+    document.getElementById('typeCounterText').innerText = `${typeIndex + 1}/${typeQueue.length}`;
     document.getElementById('typeInput').value = '';
     document.getElementById('typeResult').innerText = '';
     
-    let word = vocab[typeIndex];
-    let isViToKr = Math.random() > 0.5; // Random 50/50: Hỏi Việt đáp Hàn, hoặc Hỏi Hàn đáp Việt
+    let q = typeQueue[typeIndex];
+    let word = q.word;
+    let isViToKr = q.isViToKr;
+    currentTypeWordId = word.kr; // Lấy ID từ gốc
     
     let promptEl = document.getElementById('typePromptWord');
     let hintEl = document.getElementById('typePromptHint');
@@ -559,23 +578,22 @@ function checkTypeGame() {
     if(!ans) return showToast("Bạn chưa nhập đáp án", "error");
     
     let correctAns = currentTypeAns.toLowerCase();
-    let wordId = vocab[typeIndex].kr;
 
     if(ans === correctAns) {
         resBox.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check"></i> Chính xác!</span>`;
         playSuccessSound();
         
         // Kiểm tra để không cộng điểm 2 lần
-        if (!learnedWords.includes(wordId)) {
-            gain(15);
-            learnedWords.push(wordId);
+        if (!learnedWords.includes(currentTypeWordId)) {
+            gain(10);
+            learnedWords.push(currentTypeWordId);
             saveLearned();
         } else {
             showToast("Bạn đã thuộc từ này! (Không cộng thêm EXP)");
         }
         
         typeIndex++;
-        setTimeout(startTypeGame, 1200);
+        setTimeout(startTypeGame, 1000);
     } else {
         resBox.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> Sai. Đáp án: <b class="${currentTypeLang === 'kr' ? 'text-kr' : 'text-vi'}">${currentTypeAns}</b></span>`;
     }
