@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Korean Trainer PRO+ (Typing Mastery)</title>
+<title>Korean Trainer PRO+ (Perfect Core)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
 <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
@@ -436,10 +435,8 @@ let index = 0, exp = 0, level = 1, selected = null; let currentAIWord = null; le
 let quizStartTime; let quizTimerInterval; let currentQuizType = 'quiz_kr_vi';
 
 let learnedWords = [];
-
-// Các biến cho tính năng Luyện Gõ Từ
 let typeIndex = 0;
-let typeQueue = []; // Bể chứa 2N câu hỏi
+let typeQueue = []; 
 let currentTypeAns = "";
 let currentTypeLang = "";
 let currentTypeWordId = "";
@@ -470,19 +467,33 @@ document.getElementById('autoTransKr').addEventListener('focus', function() { ac
 document.getElementById('listenInput').addEventListener('focus', function() { activeVirtualInput = this; });
 document.getElementById('typeInput').addEventListener('focus', function() { activeVirtualInput = this; });
 
-async function initDatabase() {
-    let storedExp = await localforage.getItem("expData"); if(storedExp) { exp = storedExp.exp; level = storedExp.level; }
-    let storedLearned = await localforage.getItem("learnedWords"); if(storedLearned) learnedWords = storedLearned;
-    let storedSets = await localforage.getItem("vocabSets"); if(storedSets) vocabSets = storedSets;
-    updateExpUI();
-    let storedActiveIds = await localforage.getItem("activeSetIds");
-    if(storedActiveIds && storedActiveIds.length > 0) activeSetIds = storedActiveIds.filter(id => vocabSets.some(set => set.id === id));
-    else if(vocabSets.length > 0) activeSetIds = [vocabSets[0].id];
-    updateCombinedVocab(false);
+// THAY ĐỔI ĐỂ LƯU DỮ LIỆU HOÀN HẢO BẰNG LOCALSTORAGE
+function initDatabase() {
+    try {
+        let storedExp = JSON.parse(localStorage.getItem("expData"));
+        if(storedExp) { exp = storedExp.exp; level = storedExp.level; }
+        
+        let storedLearned = JSON.parse(localStorage.getItem("learnedWords"));
+        if(storedLearned) learnedWords = storedLearned;
+        
+        let storedSets = JSON.parse(localStorage.getItem("vocabSets"));
+        if(storedSets) vocabSets = storedSets;
+        
+        updateExpUI();
+        
+        let storedActiveIds = JSON.parse(localStorage.getItem("activeSetIds"));
+        if(storedActiveIds && storedActiveIds.length > 0) activeSetIds = storedActiveIds.filter(id => vocabSets.some(set => set.id === id));
+        else if(vocabSets.length > 0) activeSetIds = [vocabSets[0].id];
+        
+        updateCombinedVocab(false);
+    } catch(e) {
+        console.log("Khởi tạo database mới");
+    }
 }
 initDatabase();
-function saveProgress() { localforage.setItem("expData", {exp, level}); }
-function saveLearned() { localforage.setItem("learnedWords", learnedWords); }
+
+function saveProgress() { localStorage.setItem("expData", JSON.stringify({exp, level})); }
+function saveLearned() { localStorage.setItem("learnedWords", JSON.stringify(learnedWords)); }
 
 function resetProgress() {
     if(confirm("Bạn có chắc chắn muốn xóa toàn bộ Level, EXP và Danh sách từ đã thuộc?")) {
@@ -504,15 +515,42 @@ function renderSetsList() {
     });
 }
 function toggleSet(id) { if(activeSetIds.includes(id)) activeSetIds=activeSetIds.filter(x=>x!==id); else activeSetIds.push(id); updateCombinedVocab(true); }
-function updateCombinedVocab(save = true) { vocab=[]; vocabSets.forEach(s=>{ if(activeSetIds.includes(s.id)) vocab=vocab.concat(s.data); }); if(save) localforage.setItem("activeSetIds", activeSetIds); renderSetsList(); document.getElementById('libraryCard').classList.remove('hide'); listenIndex = 0; typeQueue = []; }
-function deleteSet(id, e) { e.stopPropagation(); if(confirm("Xóa bài học này?")){ vocabSets=vocabSets.filter(s=>s.id!==id); localforage.setItem("vocabSets", vocabSets); activeSetIds=activeSetIds.filter(x=>x!==id); updateCombinedVocab(true); } }
+function updateCombinedVocab(save = true) { 
+    vocab=[]; 
+    vocabSets.forEach(s=>{ if(activeSetIds.includes(s.id)) vocab=vocab.concat(s.data); }); 
+    if(save) localStorage.setItem("activeSetIds", JSON.stringify(activeSetIds)); 
+    renderSetsList(); document.getElementById('libraryCard').classList.remove('hide'); listenIndex = 0; typeQueue = []; 
+}
+function deleteSet(id, e) { 
+    e.stopPropagation(); 
+    if(confirm("Xóa bài học này?")){ 
+        vocabSets=vocabSets.filter(s=>s.id!==id); 
+        localStorage.setItem("vocabSets", JSON.stringify(vocabSets)); 
+        activeSetIds=activeSetIds.filter(x=>x!==id); 
+        updateCombinedVocab(true); 
+    } 
+}
 
 function openCreateModal() { editingSetId = null; document.getElementById('modalTitle').innerHTML = 'Tạo Bài Mới'; document.getElementById('editSetName').value = ""; document.getElementById('editSetWords').innerHTML = ""; addNewEditRow(); addNewEditRow(); document.getElementById('editModal').classList.remove('hide'); }
 function openEditModal(id, e) { e.stopPropagation(); editingSetId = id; document.getElementById('modalTitle').innerHTML = 'Sửa Bài Học'; let set = vocabSets.find(s => s.id === id); document.getElementById('editSetName').value = set.name; let html = ''; set.data.forEach((w) => { html += `<div class="edit-word-row"><input type="text" class="edit-kr text-kr" value="${w.kr}" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px;"><input type="text" class="edit-pr" value="${w.pr || ''}" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px; font-weight: 700;"><input type="text" class="edit-vi text-vi" value="${w.vi}" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px;"><button onclick="this.parentElement.remove()" class="basic-btn" style="color: var(--danger); padding: 18px; border-radius:14px; border-width: 2px;"><i class="fa-solid fa-xmark"></i></button></div>`; }); document.getElementById('editSetWords').innerHTML = html; document.getElementById('editModal').classList.remove('hide'); }
 function addNewEditRow() { let row = document.createElement('div'); row.className = 'edit-word-row'; row.innerHTML = `<input type="text" class="edit-kr text-kr" placeholder="Hàn" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px;"><input type="text" class="edit-pr" placeholder="Phiên âm" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px; font-weight: 700;"><input type="text" class="edit-vi text-vi" placeholder="Việt" style="padding:18px; border-radius:14px; border:2px solid var(--border); font-family:inherit; font-size:18px;"><button onclick="this.parentElement.remove()" class="basic-btn" style="color: var(--danger); padding: 18px; border-radius:14px; border-width: 2px;"><i class="fa-solid fa-xmark"></i></button>`; document.getElementById('editSetWords').appendChild(row); document.getElementById('editSetWords').scrollTop = document.getElementById('editSetWords').scrollHeight; }
-async function saveEditSet() { let setName = document.getElementById('editSetName').value.trim() || "Bài học mới"; let newData = []; document.querySelectorAll('#editSetWords .edit-word-row').forEach((r) => { let kr = r.querySelector('.edit-kr').value.trim(); let pr = r.querySelector('.edit-pr').value.trim(); let vi = r.querySelector('.edit-vi').value.trim(); if(kr !== "" && vi !== "") newData.push({kr, pr, vi}); }); if(newData.length === 0) return showToast("Nhập ít nhất 1 từ nhé!", "error"); if (editingSetId === null) { let newId = Date.now().toString(); vocabSets.push({id: newId, name: setName, data: newData}); activeSetIds.push(newId); } else { let set = vocabSets.find(s => s.id === editingSetId); set.name = setName; set.data = newData; } await localforage.setItem("vocabSets", vocabSets); updateCombinedVocab(true); closeEditModal(); }
+function saveEditSet() { 
+    let setName = document.getElementById('editSetName').value.trim() || "Bài học mới"; let newData = []; 
+    document.querySelectorAll('#editSetWords .edit-word-row').forEach((r) => { 
+        let kr = r.querySelector('.edit-kr').value.trim(); let pr = r.querySelector('.edit-pr').value.trim(); let vi = r.querySelector('.edit-vi').value.trim(); 
+        if(kr !== "" && vi !== "") newData.push({kr, pr, vi}); 
+    }); 
+    if(newData.length === 0) return showToast("Nhập ít nhất 1 từ nhé!", "error"); 
+    if (editingSetId === null) { 
+        let newId = Date.now().toString(); vocabSets.push({id: newId, name: setName, data: newData}); activeSetIds.push(newId); 
+    } else { 
+        let set = vocabSets.find(s => s.id === editingSetId); set.name = setName; set.data = newData; 
+    } 
+    localStorage.setItem("vocabSets", JSON.stringify(vocabSets)); 
+    updateCombinedVocab(true); closeEditModal(); 
+}
 function closeEditModal() { document.getElementById('editModal').classList.add('hide'); }
-function loadExcel() { let f = document.getElementById('file').files[0]; if(!f) return; let setName = prompt("Tên bài học:", f.name.replace(/\.[^/.]+$/, "")) || "Bài học"; let r = new FileReader(); r.onload = async e => { let ws = XLSX.read(e.target.result, {type: 'binary'}).Sheets[XLSX.read(e.target.result, {type: 'binary'}).SheetNames[0]]; let data = XLSX.utils.sheet_to_json(ws, {header: 1}); let newData = []; data.forEach((r) => { if(r[0] && r[2]) newData.push({kr: String(r[0]).trim(), pr: r[1] ? String(r[1]).trim() : "", vi: String(r[2]).trim()}); }); if(newData.length>0) { let id = Date.now().toString(); vocabSets.push({id:id, name:setName, data:newData}); await localforage.setItem("vocabSets", vocabSets); activeSetIds.push(id); updateCombinedVocab(true); showToast(`Đã tải ${newData.length} từ!`); } document.getElementById('file').value = ""; }; r.readAsBinaryString(f); }
+function loadExcel() { let f = document.getElementById('file').files[0]; if(!f) return; let setName = prompt("Tên bài học:", f.name.replace(/\.[^/.]+$/, "")) || "Bài học"; let r = new FileReader(); r.onload = async e => { let ws = XLSX.read(e.target.result, {type: 'binary'}).Sheets[XLSX.read(e.target.result, {type: 'binary'}).SheetNames[0]]; let data = XLSX.utils.sheet_to_json(ws, {header: 1}); let newData = []; data.forEach((r) => { if(r[0] && r[2]) newData.push({kr: String(r[0]).trim(), pr: r[1] ? String(r[1]).trim() : "", vi: String(r[2]).trim()}); }); if(newData.length>0) { let id = Date.now().toString(); vocabSets.push({id:id, name:setName, data:newData}); localStorage.setItem("vocabSets", JSON.stringify(vocabSets)); activeSetIds.push(id); updateCombinedVocab(true); showToast(`Đã tải ${newData.length} từ!`); } document.getElementById('file').value = ""; }; r.readAsBinaryString(f); }
 
 function showToast(msg, type = "info") { const t = document.getElementById('toast'); t.innerHTML = type === "error" ? `<i class="fa-solid fa-circle-exclamation" style="color:var(--danger); font-size: 24px;"></i> ${msg}` : `<i class="fa-solid fa-circle-check" style="color:var(--success); font-size: 24px;"></i> ${msg}`; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
 function openScreen(id) { if(vocab.length === 0 && id !== "home") return showToast("Bạn phải chọn bài học trước đã!", "error"); document.querySelectorAll('main > div:not(#toast):not(#keyboard-wrap):not(#editModal)').forEach(el => el.classList.add('hide')); let targetId = id.startsWith('quiz') ? 'quiz' : id; document.getElementById(targetId).classList.remove("hide"); closeKeyboard(); if(id == "flash") showFlash(); if(id == "match") startMatchGame(); if(id == "auto_write") generateNewAutoPrompt(); if(id == "listen") startListenGame(); if(id == "type_word") startTypeGame(); if(id.startsWith("quiz")) startQuiz(id); }
@@ -520,14 +558,13 @@ function back() { document.querySelectorAll('main > div:not(#toast):not(#keyboar
 function updateExpUI() { document.getElementById('level').innerText=level; document.getElementById('exp').innerText=exp; document.getElementById('bar').style.width=exp+"%"; }
 function gain(x) { exp+=x; if(exp>=100){exp-=100; level++; showToast(`Lên cấp ${level}!`); playSuccessSound();} updateExpUI(); saveProgress(); }
 
-// --- HỆ THỐNG LUYỆN GÕ TỪ (HỎI ĐỦ 2 CHIỀU) ---
+// --- HỆ THỐNG LUYỆN GÕ TỪ (CHO PHÉP THỬ LẠI KHI SAI) ---
 function buildTypeQueue() {
     typeQueue = [];
     vocab.forEach(w => {
-        typeQueue.push({ word: w, isViToKr: true });  // Câu Việt -> Hàn
-        typeQueue.push({ word: w, isViToKr: false }); // Câu Hàn -> Việt
+        typeQueue.push({ word: w, isViToKr: true });  
+        typeQueue.push({ word: w, isViToKr: false }); 
     });
-    // Trộn ngẫu nhiên thứ tự các câu hỏi
     typeQueue.sort(() => Math.random() - 0.5);
     typeIndex = 0;
 }
@@ -535,7 +572,6 @@ function buildTypeQueue() {
 function startTypeGame() {
     if(vocab.length === 0) return;
     
-    // Nếu chưa tạo bể câu hỏi hoặc đã làm hết thì tạo lại
     if(typeQueue.length === 0 || typeIndex >= typeQueue.length) {
         buildTypeQueue();
     }
@@ -547,7 +583,7 @@ function startTypeGame() {
     let q = typeQueue[typeIndex];
     let word = q.word;
     let isViToKr = q.isViToKr;
-    currentTypeWordId = word.kr; // Lấy ID từ gốc
+    currentTypeWordId = word.kr; 
     
     let promptEl = document.getElementById('typePromptWord');
     let hintEl = document.getElementById('typePromptHint');
@@ -583,7 +619,6 @@ function checkTypeGame() {
         resBox.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check"></i> Chính xác!</span>`;
         playSuccessSound();
         
-        // Kiểm tra để không cộng điểm 2 lần
         if (!learnedWords.includes(currentTypeWordId)) {
             gain(10);
             learnedWords.push(currentTypeWordId);
@@ -595,17 +630,20 @@ function checkTypeGame() {
         typeIndex++;
         setTimeout(startTypeGame, 1000);
     } else {
-        resBox.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> Sai. Đáp án: <b class="${currentTypeLang === 'kr' ? 'text-kr' : 'text-vi'}">${currentTypeAns}</b></span>`;
+        // NẾU SAI: Báo lỗi và cho phép nhập lại
+        resBox.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> Sai rồi, hãy thử lại nhé!</span>`;
+        document.getElementById('typeInput').value = '';
+        document.getElementById('typeInput').focus();
     }
 }
 
 function skipTypeGame() {
     document.getElementById('typeResult').innerHTML = `<span style="color:var(--text-muted)">Đáp án: <b class="${currentTypeLang === 'kr' ? 'text-kr' : 'text-vi'}">${currentTypeAns}</b></span>`;
     typeIndex++;
-    setTimeout(startTypeGame, 1200);
+    setTimeout(startTypeGame, 1500);
 }
-// ----------------------------------------
 
+// --- HỆ THỐNG LUYỆN NGHE (CHO PHÉP THỬ LẠI KHI SAI) ---
 function startListenGame() { if(vocab.length === 0) return; if(listenIndex >= vocab.length) listenIndex = 0; document.getElementById('listenCounterText').innerText = `${listenIndex + 1}/${vocab.length}`; document.getElementById('listenInput').value = ''; document.getElementById('listenResult').innerText = ''; playListenAudio(); }
 function playListenAudio() { if(vocab.length === 0) return; speechSynthesis.cancel(); let u = new SpeechSynthesisUtterance(vocab[listenIndex].kr); u.lang = "ko-KR"; u.rate = 0.8; speechSynthesis.speak(u); }
 function checkListen() { 
@@ -631,10 +669,13 @@ function checkListen() {
         listenIndex++; 
         setTimeout(startListenGame, 1200); 
     } else { 
-        resBox.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> Sai. Đáp án: <b class="text-kr">${correctWord.kr}</b></span>`; 
+        // NẾU SAI: Báo lỗi và cho phép nhập lại
+        resBox.innerHTML = `<span style="color:var(--danger)"><i class="fa-solid fa-xmark"></i> Sai rồi, hãy thử lại!</span>`; 
+        document.getElementById('listenInput').value = '';
+        document.getElementById('listenInput').focus();
     } 
 }
-function skipListenGame() { document.getElementById('listenResult').innerHTML = `<span style="color:var(--text-muted)">Đáp án: <b class="text-kr">${vocab[listenIndex].kr}</b></span>`; listenIndex++; setTimeout(startListenGame, 1200); }
+function skipListenGame() { document.getElementById('listenResult').innerHTML = `<span style="color:var(--text-muted)">Đáp án: <b class="text-kr">${vocab[listenIndex].kr}</b></span>`; listenIndex++; setTimeout(startListenGame, 1500); }
 
 async function callVercelBackend(promptText) {
     try {
