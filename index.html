@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Korean Trainer PRO+ (Keyboard Shortcuts)</title>
+<title>Korean Trainer PRO+ (Smart Matching)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -415,7 +415,31 @@
 </main>
 
 <script>
-// --- QUẢN LÝ ÂM LƯỢNG TOÀN CỤC ---
+// --- HÀM KIỂM TRA ĐÁP ÁN THÔNG MINH (XỬ LÝ DẤU NGOẶC, PHẨY, XUYỆT) ---
+function checkAnswerMatch(input, target) {
+    let i = input.trim().toLowerCase();
+    let t = target.trim().toLowerCase();
+    if(i === t) return true; // Khớp y hệt
+    
+    // Xử lý dấu ngoặc đơn. Ví dụ: 아버지(아빠) -> sẽ chấm đúng nếu gõ "아버지" hoặc "아빠"
+    let match = t.match(/^([^\(]+)\s*\(([^)]+)\)$/);
+    if (match) {
+        if (i === match[1].trim() || i === match[2].trim()) return true;
+    }
+    
+    // Xử lý dấu phẩy hoặc xuyệt (nếu trong file Excel gõ nhiều nghĩa)
+    if (t.includes(',')) {
+        let parts = t.split(',').map(x => x.trim());
+        if (parts.includes(i)) return true;
+    }
+    if (t.includes('/')) {
+        let parts = t.split('/').map(x => x.trim());
+        if (parts.includes(i)) return true;
+    }
+    
+    return false;
+}
+
 let globalVolume = 1.0;
 
 function playSuccessSound() {
@@ -429,7 +453,6 @@ function playSuccessSound() {
         osc.frequency.setValueAtTime(400, ctx.currentTime); 
         osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1); 
         
-        // Tôn trọng âm lượng global
         gain.gain.setValueAtTime(0.1 * globalVolume, ctx.currentTime); 
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15); 
         
@@ -459,7 +482,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // GẮN SỰ KIỆN PHÍM ENTER CHO CÁC Ô INPUT (BÀN PHÍM VẬT LÝ)
     document.getElementById('listenInput').addEventListener('keypress', function(e) {
         if(e.key === 'Enter') { e.preventDefault(); checkListen(); }
     });
@@ -468,20 +490,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// SỰ KIỆN ĐIỀU HƯỚNG MŨI TÊN (BÀN PHÍM VẬT LÝ)
 document.addEventListener('keydown', function(e) {
     let activeTag = document.activeElement.tagName.toLowerCase();
     let isInput = activeTag === 'input' || activeTag === 'textarea';
 
     if (!isInput) {
-        // Mũi tên TRÁI / PHẢI để lướt thẻ
         let flashScreen = document.getElementById('flash');
         if (!flashScreen.classList.contains('hide')) {
             if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
             if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
         }
 
-        // Mũi tên LÊN / XUỐNG để chỉnh âm lượng
         if (e.key === 'ArrowUp') {
             e.preventDefault();
             globalVolume = Math.min(1.0, globalVolume + 0.1);
@@ -500,7 +519,6 @@ function handleVirtualKeyPress(button) {
     if (button === "{shift}") { isKeyboardShift = !isKeyboardShift; keyboard.setOptions({ layoutName: isKeyboardShift ? "shift" : "default" }); return; }
     let text = activeVirtualInput.value; let jamoArray = Hangul.d(text);
     
-    // Xử lý nút Enter trên bàn phím ảo
     if (button === "{enter}") {
         if (activeVirtualInput.id === 'listenInput') { checkListen(); closeKeyboard(); return; }
         if (activeVirtualInput.id === 'typeInput') { checkTypeGame(); closeKeyboard(); return; }
@@ -546,6 +564,14 @@ initDatabase();
 
 function saveProgress() { localStorage.setItem("expData", JSON.stringify({exp, level})); }
 function saveLearned() { localStorage.setItem("learnedWords", JSON.stringify(learnedWords)); }
+
+function resetProgress() {
+    if(confirm("Bạn có chắc chắn muốn xóa toàn bộ Level, EXP và Danh sách từ đã thuộc?")) {
+        exp = 0; level = 1; learnedWords = [];
+        saveProgress(); saveLearned(); updateExpUI();
+        showToast("Đã Reset tiến độ học!", "success");
+    }
+}
 
 function renderSetsList() {
     const listEl = document.getElementById('vocabSetsList'); document.getElementById('setCountText').innerText = vocabSets.length;
@@ -650,17 +676,16 @@ function startTypeGame() {
         inputEl.classList.remove('text-kr');
     }
     
-    inputEl.focus(); // Tự động focus để gõ luôn
+    inputEl.focus();
 }
 
 function checkTypeGame() {
-    let ans = document.getElementById('typeInput').value.trim().toLowerCase();
+    let ans = document.getElementById('typeInput').value;
     let resBox = document.getElementById('typeResult');
-    if(!ans) return showToast("Bạn chưa nhập đáp án", "error");
+    if(!ans.trim()) return showToast("Bạn chưa nhập đáp án", "error");
     
-    let correctAns = currentTypeAns.toLowerCase();
-
-    if(ans === correctAns) {
+    // TÍCH HỢP KIỂM TRA THÔNG MINH
+    if(checkAnswerMatch(ans, currentTypeAns)) {
         resBox.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check"></i> Chính xác!</span>`;
         playSuccessSound();
         
@@ -702,18 +727,19 @@ function playListenAudio() {
     let u = new SpeechSynthesisUtterance(vocab[listenIndex].kr); 
     u.lang = "ko-KR"; 
     u.rate = 0.8; 
-    u.volume = globalVolume; // Áp dụng âm lượng
+    u.volume = globalVolume;
     speechSynthesis.speak(u); 
 }
 function checkListen() { 
-    let ans = document.getElementById('listenInput').value.trim(); 
+    let ans = document.getElementById('listenInput').value; 
     let resBox = document.getElementById('listenResult'); 
-    if(!ans) return showToast("Bạn chưa nhập đáp án", "error"); 
+    if(!ans.trim()) return showToast("Bạn chưa nhập đáp án", "error"); 
     
     let correctWord = vocab[listenIndex]; 
     let wordId = correctWord.kr; 
 
-    if(ans === correctWord.kr) { 
+    // TÍCH HỢP KIỂM TRA THÔNG MINH
+    if(checkAnswerMatch(ans, correctWord.kr)) { 
         resBox.innerHTML = `<span style="color:var(--success)"><i class="fa-solid fa-check"></i> Chính xác: ${correctWord.vi}</span>`; 
         playSuccessSound(); 
         
@@ -800,20 +826,8 @@ async function checkTranslationAI() {
     finally { b.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> AI Phân Tích`; b.disabled = false; } 
 }
 
-function showFlash() { 
-    let v = vocab[index]; 
-    document.getElementById('flashCounter').innerText = `${index + 1}/${vocab.length}`; 
-    document.getElementById('flashWord').innerText = v.kr; 
-    document.getElementById('flashPr').innerText = v.pr ? `[${v.pr}]` : ""; 
-    document.getElementById('flashMean').innerText = v.vi; 
-}
-function speak() { 
-    speechSynthesis.cancel(); 
-    let u = new SpeechSynthesisUtterance(vocab[index].kr); 
-    u.lang = "ko-KR"; 
-    u.volume = globalVolume; // Áp dụng âm lượng
-    speechSynthesis.speak(u); 
-}
+function showFlash() { let v = vocab[index]; document.getElementById('flashCounter').innerText = `${index + 1}/${vocab.length}`; document.getElementById('flashWord').innerText = v.kr; document.getElementById('flashPr').innerText = v.pr ? `[${v.pr}]` : ""; document.getElementById('flashMean').innerText = v.vi; }
+function speak() { speechSynthesis.cancel(); let u = new SpeechSynthesisUtterance(vocab[index].kr); u.lang = "ko-KR"; u.volume = globalVolume; speechSynthesis.speak(u); }
 function next() { index = (index + 1) % vocab.length; showFlash(); }
 function prev() { index = (index - 1 + vocab.length) % vocab.length; showFlash(); }
 
