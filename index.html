@@ -602,7 +602,63 @@ function saveEditSet() {
     updateCombinedVocab(true); closeEditModal(); 
 }
 function closeEditModal() { document.getElementById('editModal').classList.add('hide'); }
-function loadExcel() { let f = document.getElementById('file').files[0]; if(!f) return; let setName = prompt("Tên bài học:", f.name.replace(/\.[^/.]+$/, "")) || "Bài học"; let r = new FileReader(); r.onload = async e => { let ws = XLSX.read(e.target.result, {type: 'binary'}).Sheets[XLSX.read(e.target.result, {type: 'binary'}).SheetNames[0]]; let data = XLSX.utils.sheet_to_json(ws, {header: 1}); let newData = []; data.forEach((r) => { if(r[0] && r[2]) newData.push({kr: String(r[0]).trim(), pr: r[1] ? String(r[1]).trim() : "", vi: String(r[2]).trim()}); }); if(newData.length>0) { let id = Date.now().toString(); vocabSets.push({id:id, name:setName, data:newData}); localStorage.setItem("vocabSets", JSON.stringify(vocabSets)); activeSetIds.push(id); updateCombinedVocab(true); showToast(`Đã tải ${newData.length} từ!`); } document.getElementById('file').value = ""; }; r.readAsBinaryString(f); }
+
+// ==========================================
+// HÀM LOAD EXCEL MỚI ĐÃ SỬA LỖI
+// ==========================================
+function loadExcel() {
+    let fileInput = document.getElementById('file');
+    let f = fileInput.files[0];
+    if (!f) return;
+
+    let setName = prompt("Tên bài học:", f.name.replace(/\.[^/.]+$/, "")) || "Bài học";
+    let r = new FileReader();
+
+    r.onload = function(e) {
+        try {
+            let data = new Uint8Array(e.target.result);
+            let workbook = XLSX.read(data, { type: 'array' });
+            let firstSheetName = workbook.SheetNames[0];
+            let worksheet = workbook.Sheets[firstSheetName];
+
+            let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            let newData = [];
+
+            jsonData.forEach((row) => {
+                if (row[0] && row[2]) {
+                    newData.push({
+                        kr: String(row[0]).trim(),
+                        pr: row[1] ? String(row[1]).trim() : "",
+                        vi: String(row[2]).trim()
+                    });
+                }
+            });
+
+            if (newData.length > 0) {
+                let id = Date.now().toString();
+                vocabSets.push({ id: id, name: setName, data: newData });
+                localStorage.setItem("vocabSets", JSON.stringify(vocabSets));
+                activeSetIds.push(id);
+                updateCombinedVocab(true);
+                showToast(`Đã tải ${newData.length} từ thành công!`);
+            } else {
+                showToast("File Excel trống hoặc không đúng cột định dạng!", "error");
+            }
+        } catch (error) {
+            console.error("Lỗi đọc file:", error);
+            showToast("Đã xảy ra lỗi khi đọc file Excel!", "error");
+        } finally {
+            fileInput.value = ""; 
+        }
+    };
+
+    r.onerror = function() {
+        showToast("Trình duyệt không thể đọc được file này!", "error");
+        fileInput.value = "";
+    };
+
+    r.readAsArrayBuffer(f); 
+}
 
 function showToast(msg, type = "info") { const t = document.getElementById('toast'); t.innerHTML = type === "error" ? `<i class="fa-solid fa-circle-exclamation" style="color:var(--danger); font-size: 24px;"></i> ${msg}` : `<i class="fa-solid fa-circle-check" style="color:var(--success); font-size: 24px;"></i> ${msg}`; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
 function openScreen(id) { if(vocab.length === 0 && id !== "home") return showToast("Bạn phải chọn bài học trước đã!", "error"); document.querySelectorAll('main > div:not(#toast):not(#keyboard-wrap):not(#editModal):not(#syncModal)').forEach(el => el.classList.add('hide')); let targetId = id.startsWith('quiz') ? 'quiz' : id; document.getElementById(targetId).classList.remove("hide"); closeKeyboard(); if(id == "flash") showFlash(); if(id == "match") startMatchGame(); if(id == "auto_write") generateNewAutoPrompt(); if(id == "listen") startListenGame(); if(id == "type_word") startTypeGame(); if(id.startsWith("quiz")) startQuiz(id); }
@@ -683,6 +739,8 @@ async function checkSentenceAI() {
     let u = document.getElementById('autoInput').value.trim(); if(!u) return showToast("Bạn chưa viết câu", "error"); 
     let b = document.getElementById('aiCheckBtn'); let r = document.getElementById('autoResult'); b.innerHTML = `<span class="loader"></span>...`; b.disabled = true; 
     let p = `Đóng vai giáo viên tiếng Hàn. Yêu cầu dùng từ: "${currentAIWord.kr}" (${currentAIWord.vi}). Học viên viết: "${u}". TRẢ LỜI NGẮN GỌN BẰNG HTML (Dùng thẻ div, b, span). Dùng màu: (Xanh nhạt: #3B82F6, Đỏ đô: #DC2626, Xanh lá: #059669). KHÔNG dùng markdown. KHÔNG chào hỏi. Phải có đúng 3 mục: 1. <div style="margin-bottom:12px;"><b><span style="color:#3B82F6; font-size: 20px;">1. Nhận xét:</span></b> (Đánh giá nghĩa, ngữ cảnh, có dùng từ yêu cầu chưa).</div> 2. <div style="margin-bottom:12px;"><b><span style="color:#DC2626; font-size: 20px;">2. Ngữ pháp & Lỗi sai:</span></b> (Chỉ ra lỗi chia đuôi câu, viết tách/liền. Giải thích gọn. Nếu đúng thì khen).</div> 3. <div style="margin-top:20px; padding:20px; background:#F8FAFC; border-radius:12px; border: 2px solid #E5E7EB;"><b><span style="color:#059669; font-size: 20px;">💡 Câu chuẩn tự nhiên:</span></b> <br><span class="text-kr" style="font-size: 24px; display:block; margin-top:8px;">(Viết lại câu của người Hàn)</span></div> QUAN TRỌNG: 100% Lời đánh giá phải bằng Tiếng Việt.`; 
-    try { let reply = await callVercelBackend(p); r.innerHTML = reply.replace(/
-http://googleusercontent.com/immersive_entry_chip/0
-http://googleusercontent.com/immersive_entry_chip/1
+    try { let reply = await callVercelBackend(p); r.innerHTML = reply.replace(/```html|```/g, ''); r.style.display = "block"; } catch (e) { showToast("Lỗi kết nối AI", "error"); } finally { b.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> AI Phân Tích`; b.disabled = false; } 
+}
+</script>
+</body>
+</html>
