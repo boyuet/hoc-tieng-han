@@ -347,6 +347,75 @@
       display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 22px;
     }
 
+    .flashcard-wrap {
+      max-width: 760px;
+      margin: 24px auto 0;
+      perspective: 1400px;
+    }
+    .flashcard {
+      position: relative;
+      min-height: 320px;
+      border-radius: 28px;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform .5s ease, box-shadow .2s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,.18);
+    }
+    .flashcard:hover { transform: translateY(-2px); }
+    .flashcard.is-flipped { transform: rotateY(180deg); }
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      padding: 28px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 96%, white 4%), color-mix(in srgb, var(--panel) 92%, black 8%));
+    }
+    .flashcard-face.back { transform: rotateY(180deg); }
+    .flashcard-kicker {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .flashcard-main {
+      font-family: var(--display-font);
+      font-size: clamp(28px, 4.5vw, 52px);
+      font-weight: 800;
+      line-height: 1.18;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .flashcard-sub {
+      margin-top: 16px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 88%;
+    }
+    .flashcard-help {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    .flashcard-actions {
+      margin-top: 22px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .stats-strip {
       display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 18px; margin-bottom: 24px;
     }
@@ -675,6 +744,109 @@
       }
     }
 
+    .section-hidden { display: none !important; }
+    .match-wrap { max-width: 960px; margin: 20px auto 0; }
+    .match-board { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+    .match-card { min-height: 76px; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 92%, black 8%); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+    .match-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(125,211,252,.18), 0 16px 26px rgba(56,189,248,.16); transform: translateY(-1px); }
+    .match-card.matched { opacity: .45; border-color: var(--success); pointer-events: none; }
+    .match-card.wrong { border-color: var(--danger); }
+    .match-top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:14px; }
+    @media (max-width: 720px) { .match-board { grid-template-columns: 1fr; } }
+
+    .lookup-panel {
+      margin-bottom: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--panel) 90%, black 10%);
+    }
+    .lookup-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .lookup-title {
+      font-weight: 800;
+      color: var(--text);
+      font-size: 15px;
+    }
+    .lookup-search-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .lookup-search-row .text-input {
+      min-width: 220px;
+      height: 46px;
+    }
+    .lookup-result {
+      margin-top: 12px;
+      display: grid;
+      gap: 10px;
+    }
+    .lookup-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: color-mix(in srgb, var(--panel) 92%, black 8%);
+    }
+    .lookup-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .lookup-vocab {
+      font-family: var(--display-font);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .lookup-meaning {
+      margin-top: 6px;
+      font-size: 15px;
+      color: #e5eefc;
+      font-weight: 700;
+    }
+    .lookup-meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .lookup-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .lookup-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      background: color-mix(in srgb, var(--panel) 92%, black 8%);
+    }
+    .speech-status {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .speech-status.active {
+      color: #7dd3fc;
+    }
 
     @media (max-width: 1024px) {
       .app-shell { grid-template-columns: 1fr; }
@@ -721,10 +893,10 @@
 
     <main class="study-main">
       <header class="study-header">
-        <div class="mode-pill-wrap">
-          <button class="mode-pill">👁 Xem từ</button>
-          <button class="mode-pill active">📖 Học</button>
-          <button class="mode-pill">🎮 Chơi</button>
+        <div class="mode-pill-wrap" id="sectionPills">
+          <button class="mode-pill" data-section="view">👁 Xem từ</button>
+          <button class="mode-pill active" data-section="study">📖 Học</button>
+          <button class="mode-pill" data-section="play">🎮 Chơi</button>
         </div>
       </header>
 
@@ -735,6 +907,10 @@
             <button data-mode="multiple-vi-ko">Trắc nghiệm đảo</button>
             <button data-mode="typing">Gõ từ</button>
             <button data-mode="listening">Phát âm</button>
+            <button data-mode="flashcard">Flash card</button>
+          </div>
+          <div class="tabs hidden" id="playTabs">
+            <button data-play-mode="match-pairs" class="active">Ghép cặp từ</button>
           </div>
 
           <div class="toolbar-actions">
@@ -797,6 +973,18 @@
           <div class="search-wrap">
             <span class="search-icon">🔍</span>
             <input id="searchInput" class="text-input" type="text" placeholder="Tìm theo từ hoặc nghĩa..." />
+          </div>
+
+          <div class="lookup-panel">
+            <div class="lookup-head">
+              <div class="lookup-title">Tra từ nhanh</div>
+              <button class="btn btn-outline" id="lookupCurrentBtn">Tra từ đang học</button>
+            </div>
+            <div class="lookup-search-row">
+              <input id="lookupInput" class="text-input" type="text" placeholder="Nhập từ tiếng Hàn hoặc nghĩa tiếng Việt..." />
+              <button class="btn btn-primary" id="lookupBtn" type="button">Tra nghĩa</button>
+            </div>
+            <div id="lookupResult" class="lookup-result"></div>
           </div>
 
           <div class="chips">
@@ -865,6 +1053,19 @@
       activeLessonIndex: 0,
       koreanVoice: null,
       audioCtx: null,
+      appSection: "study",
+      playMode: "match-pairs",
+      flashcardFlipped: false,
+      matchPairs: [],
+      matchSelection: [],
+      matchMoves: 0,
+      matchMatchedCount: 0,
+      matchBusy: false,
+      speechRecognition: null,
+      speechSupported: false,
+      speechListening: false,
+      speechTranscript: "",
+      lookupQuery: "",
     };
 
     function normalizeText(text) {
@@ -935,6 +1136,164 @@
       return [];
     }
 
+
+    function getAllWords() {
+      const bag = [];
+      state.subjects.forEach(subject => {
+        (subject.lessons || []).forEach(lesson => {
+          (lesson.words || []).forEach(word => {
+            bag.push({
+              ...word,
+              subjectName: subject.name,
+              lessonName: lesson.name,
+              sourceFile: lesson.sourceFile || subject.sourceFile || "Dữ liệu",
+            });
+          });
+        });
+      });
+      return bag;
+    }
+
+    function searchDictionary(query) {
+      const q = normalizeText(query);
+      if (!q) return [];
+      const allWords = getAllWords();
+      const exact = [];
+      const partial = [];
+      const seen = new Set();
+      allWords.forEach(item => {
+        const key = `${normalizeText(item.vocab)}__${normalizeText(item.meaning)}__${normalizeText(item.subjectName)}__${normalizeText(item.lessonName)}`;
+        if (seen.has(key)) return;
+        const vocabText = normalizeText(item.vocab);
+        const meaningText = normalizeText(item.meaning);
+        const exactHit = vocabText === q || meaningText === q;
+        const partialHit = vocabText.includes(q) || meaningText.includes(q);
+        if (!exactHit && !partialHit) return;
+        seen.add(key);
+        (exactHit ? exact : partial).push(item);
+      });
+      return [...exact, ...partial].slice(0, 12);
+    }
+
+    function buildLookupLinks(query) {
+      const encoded = encodeURIComponent(String(query || '').trim());
+      if (!encoded) return [];
+      return [
+        { label: 'Naver Dict', url: `https://dict.naver.com/search.dict?query=${encoded}` },
+        { label: 'Papago', url: `https://papago.naver.com/?sk=ko&tk=vi&text=${encoded}` },
+        { label: 'Google Dịch', url: `https://translate.google.com/?sl=ko&tl=vi&text=${encoded}&op=translate` },
+      ];
+    }
+
+    function applyLookup(query) {
+      state.lookupQuery = String(query || '').trim();
+      const input = document.getElementById('lookupInput');
+      if (input) input.value = state.lookupQuery;
+      renderLookupResults();
+    }
+
+    function renderLookupResults() {
+      const box = document.getElementById('lookupResult');
+      if (!box) return;
+      const query = state.lookupQuery.trim();
+      if (!query) {
+        box.innerHTML = `<div class="lookup-item"><div class="lookup-meta">Nhập một từ tiếng Hàn hoặc nghĩa tiếng Việt để tra trong dữ liệu của bạn. Nếu chưa có trong bài học, bạn có thể mở nhanh từ điển ngoài.</div></div>`;
+        return;
+      }
+      const results = searchDictionary(query);
+      const links = buildLookupLinks(query).map(link => `<a class="lookup-link" href="${link.url}" target="_blank" rel="noopener noreferrer">↗ ${link.label}</a>`).join('');
+      if (!results.length) {
+        box.innerHTML = `<div class="lookup-item"><div class="lookup-meta">Chưa tìm thấy trong dữ liệu hiện có cho từ <b>${escapeHtml(query)}</b>.</div><div class="lookup-links">${links}</div></div>`;
+        return;
+      }
+      box.innerHTML = results.map(item => `
+        <div class="lookup-item">
+          <div class="lookup-item-top">
+            <div>
+              <div class="lookup-vocab">${escapeHtml(item.vocab)}</div>
+              <div class="lookup-meaning">${escapeHtml(item.meaning)}</div>
+              <div class="lookup-meta">${escapeHtml(item.subjectName)} • ${escapeHtml(item.lessonName)} • ${escapeHtml(item.sourceFile)}</div>
+            </div>
+          </div>
+          <div class="lookup-links">
+            <button class="btn btn-ghost" onclick='speakKorean(${JSON.stringify(item.vocab)}, Number(state.listeningRate))'>🔊 Nghe</button>
+            ${links}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        state.speechSupported = false;
+        return;
+      }
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'ko-KR';
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        recognition.continuous = false;
+        recognition.onstart = () => {
+          state.speechListening = true;
+          state.speechTranscript = 'Đang nghe... hãy nói từ tiếng Hàn';
+          renderQuestion();
+        };
+        recognition.onresult = (event) => {
+          let transcript = '';
+          for (let i = event.resultIndex; i < event.results.length; i += 1) {
+            transcript += event.results[i][0].transcript + ' ';
+          }
+          transcript = transcript.trim();
+          state.answer = transcript;
+          state.speechTranscript = transcript ? `Bạn vừa nói: ${transcript}` : 'Không nghe rõ, hãy thử lại.';
+          const input = document.getElementById('answerInput');
+          if (input) input.value = transcript;
+          const status = document.getElementById('speechStatus');
+          if (status) status.textContent = state.speechTranscript;
+        };
+        recognition.onerror = (event) => {
+          state.speechListening = false;
+          state.speechTranscript = event.error === 'not-allowed'
+            ? 'Bạn cần cho phép dùng microphone trong Safari/trình duyệt.'
+            : 'Micro chưa dùng được trên thiết bị hoặc trình duyệt này.';
+          renderQuestion();
+        };
+        recognition.onend = () => {
+          state.speechListening = false;
+          renderQuestion();
+        };
+        state.speechRecognition = recognition;
+        state.speechSupported = true;
+      } catch (err) {
+        console.error(err);
+        state.speechSupported = false;
+      }
+    }
+
+    function toggleSpeechInput() {
+      if (!state.speechSupported || !state.speechRecognition) {
+        state.speechTranscript = 'Trình duyệt này chưa hỗ trợ micro trực tiếp. Trên iOS, nên thử Safari mới nhất.';
+        renderQuestion();
+        return;
+      }
+      try {
+        if (state.speechListening) {
+          state.speechRecognition.stop();
+        } else {
+          state.speechTranscript = '';
+          state.speechRecognition.lang = 'ko-KR';
+          state.speechRecognition.start();
+        }
+      } catch (err) {
+        console.error(err);
+        state.speechListening = false;
+        state.speechTranscript = 'Không thể khởi động micro. Hãy thử lại.';
+        renderQuestion();
+      }
+    }
+
     function detectColumns(row) {
       const keys = Object.keys(row || {});
       if (!keys.length) return { vocabKey: null, meaningKey: null };
@@ -983,6 +1342,8 @@
         wrongWords: state.wrongWords,
         activeSubjectIndex: state.activeSubjectIndex,
         activeLessonIndex: state.activeLessonIndex,
+        appSection: state.appSection,
+        playMode: state.playMode,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
     }
@@ -1002,6 +1363,8 @@
         if (Number.isInteger(saved.activeSubjectIndex) && saved.activeSubjectIndex >= 0 && saved.activeSubjectIndex < state.subjects.length) {
           state.activeSubjectIndex = saved.activeSubjectIndex;
         }
+        if (saved.appSection) state.appSection = saved.appSection;
+        if (saved.playMode) state.playMode = saved.playMode;
         const lessons = getActiveSubject()?.lessons || [];
         if (Number.isInteger(saved.activeLessonIndex) && saved.activeLessonIndex >= 0 && saved.activeLessonIndex < lessons.length) {
           state.activeLessonIndex = saved.activeLessonIndex;
@@ -1335,6 +1698,7 @@
       state.answer = "";
       state.selectedChoice = "";
       state.feedback = null;
+      state.flashcardFlipped = false;
       state.currentOptions = [];
 
       if (nextIndex >= state.quizOrder.length) {
@@ -1366,7 +1730,7 @@
     function moveChoiceSelection(step) {
       const current = getCurrent();
       if (!current || state.feedback) return;
-      const options = getOptions(current);
+      const options = state.currentOptions.length ? state.currentOptions : (state.currentOptions = buildOptionsForCurrent(current));
       if (!options.length) return;
       const currentIndex = options.findIndex(choice => normalizeText(choice) === normalizeText(state.selectedChoice));
       const nextIndex = currentIndex < 0 ? 0 : (currentIndex + step + options.length) % options.length;
@@ -1376,6 +1740,11 @@
 
     function updateAnswer(value) {
       state.answer = value;
+    }
+
+    function toggleFlashcard(forceValue) {
+      state.flashcardFlipped = typeof forceValue === "boolean" ? forceValue : !state.flashcardFlipped;
+      renderQuestion();
     }
 
     function renderTopicList() {
@@ -1448,12 +1817,84 @@
       return "tone-amber";
     }
 
+    function initMatchGame() {
+      const words = shuffleArray([...getWords()]).slice(0, Math.min(6, getWords().length));
+      const cards = [];
+      words.forEach((w, index) => {
+        cards.push({ id: makeId("mc"), pairId: `${index}`, type: "vocab", text: w.vocab, matched: false, wrong: false });
+        cards.push({ id: makeId("mc"), pairId: `${index}`, type: "meaning", text: w.meaning, matched: false, wrong: false });
+      });
+      state.matchPairs = shuffleArray(cards);
+      state.matchSelection = [];
+      state.matchMoves = 0;
+      state.matchMatchedCount = 0;
+      state.matchBusy = false;
+    }
+
+    function selectSection(section) {
+      state.appSection = section;
+      if (section === "play" && !state.matchPairs.length) initMatchGame();
+      saveState();
+      render();
+    }
+
+    function handleMatchCard(cardId) {
+      if (state.matchBusy) return;
+      const card = state.matchPairs.find(c => c.id === cardId);
+      if (!card || card.matched) return;
+      if (state.matchSelection.includes(cardId)) return;
+      if (state.matchSelection.length >= 2) return;
+      card.wrong = false;
+      state.matchSelection.push(cardId);
+      if (state.matchSelection.length === 2) {
+        state.matchMoves += 1;
+        const [aId, bId] = state.matchSelection;
+        const a = state.matchPairs.find(c => c.id === aId);
+        const b = state.matchPairs.find(c => c.id === bId);
+        if (a && b && a.pairId === b.pairId && a.type !== b.type) {
+          a.matched = true; b.matched = true;
+          state.matchSelection = [];
+          state.matchMatchedCount += 1;
+          playFeedbackSound(true);
+          if (state.matchMatchedCount >= Math.min(6, getWords().length)) {
+            setTimeout(() => renderQuestion(), 50);
+          }
+        } else {
+          if (a) a.wrong = true;
+          if (b) b.wrong = true;
+          state.matchBusy = true;
+          playFeedbackSound(false);
+          setTimeout(() => {
+            state.matchPairs.forEach(c => c.wrong = false);
+            state.matchSelection = [];
+            state.matchBusy = false;
+            renderQuestion();
+          }, 650);
+        }
+      }
+      renderQuestion();
+    }
+
     function renderQuestion() {
       const current = getCurrent();
       const lesson = getActiveLesson();
       const area = document.getElementById("questionArea");
       if (!lesson) {
         area.innerHTML = `<div class="card question-card"><div style="text-align:center;color:var(--muted);">Chưa có bài nào để học. Hãy tạo bài hoặc nhập Excel vào môn học.</div></div>`;
+        return;
+      }
+      if (state.appSection === "view") {
+        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chế độ xem từ vựng</div><div class="question-text tone-sky">${getWords().length} từ</div><div class="flashcard-help">Cuộn xuống bên dưới để xem toàn bộ từ vựng, nghe phát âm, sửa hoặc xóa từ.</div></div>`;
+        return;
+      }
+      if (state.appSection === "play") {
+        if (!getWords().length) {
+          area.innerHTML = `<div class="card question-card"><div style="text-align:center;color:var(--muted);">Bài này chưa có đủ từ để chơi.</div></div>`;
+          return;
+        }
+        if (!state.matchPairs.length) initMatchGame();
+        const done = state.matchMatchedCount >= Math.min(6, getWords().length);
+        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div>Bạn đã ghép đúng hết các cặp từ. Bấm chơi lại để trộn bộ mới.</div></div>` : `<div class="flashcard-help">Mỗi lượt chọn 1 từ tiếng Hàn và 1 nghĩa tiếng Việt tương ứng.</div>`}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button></div></div></div>`;
         return;
       }
       if (!current) {
@@ -1465,13 +1906,15 @@
       if (state.mode === "multiple-ko-vi") title = current.vocab;
       else if (state.mode === "multiple-vi-ko") title = current.meaning;
       else if (state.mode === "typing") title = current.meaning;
+      else if (state.mode === "flashcard") title = current.vocab;
       else title = current.meaning;
 
       let label = "";
       if (state.mode === "multiple-ko-vi") label = "Chọn nghĩa tiếng Việt đúng cho từ tiếng Hàn";
       else if (state.mode === "multiple-vi-ko") label = "Chọn từ tiếng Hàn đúng cho nghĩa tiếng Việt";
       else if (state.mode === "typing") label = "Nhập từ tiếng Hàn tương ứng với nghĩa";
-      else label = "Nghe phát âm và nhập lại từ tiếng Hàn";
+      else if (state.mode === "flashcard") label = "Chạm vào thẻ để lật xem nghĩa tiếng Việt";
+      else label = "Nghe phát âm rồi gõ hoặc bấm micro để nói lại từ tiếng Hàn";
 
       let html = `
         <div class="card question-card">
@@ -1486,7 +1929,7 @@
       `;
 
       if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
-        const options = getOptions(current);
+        const options = state.currentOptions.length ? state.currentOptions : (state.currentOptions = buildOptionsForCurrent(current));
         const labels = ["A", "B", "C", "D"];
         html += `<div class="choice-grid">`;
         options.forEach((choice, index) => {
@@ -1503,12 +1946,37 @@
           `;
         });
         html += `</div>`;
+      } else if (state.mode === "flashcard") {
+        html += `
+          <div class="flashcard-wrap">
+            <div class="flashcard ${state.flashcardFlipped ? "is-flipped" : ""}" onclick="toggleFlashcard()">
+              <div class="flashcard-face front">
+                <div class="flashcard-kicker">Mặt trước</div>
+                <div class="flashcard-main tone-emerald">${escapeHtml(current.vocab)}</div>
+                <div class="flashcard-sub">Chạm để lật thẻ, nghe phát âm và ghi nhớ nghĩa.</div>
+              </div>
+              <div class="flashcard-face back">
+                <div class="flashcard-kicker">Mặt sau</div>
+                <div class="flashcard-main tone-violet">${escapeHtml(current.meaning)}</div>
+                <div class="flashcard-sub">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div>
+              </div>
+            </div>
+            <div class="flashcard-help">Chạm vào thẻ để lật. Dùng Enter để lật/qua thẻ tiếp theo.</div>
+          </div>
+          <div class="flashcard-actions">
+            <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe từ</button>
+            <button class="btn btn-outline" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
+            <button class="btn btn-primary" onclick="handleNext()">Thẻ tiếp theo</button>
+          </div>
+        `;
       } else {
         html += `
           <div class="input-row">
             <input id="answerInput" class="text-input" type="text" value="${escapeHtml(state.answer)}" placeholder="Nhập từ tiếng Hàn..." oninput="updateAnswer(this.value)" />
             ${state.mode === "listening" ? `<button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Phát âm</button>` : ``}
+            <button class="btn btn-outline" onclick="toggleSpeechInput()">${state.speechListening ? "🛑 Dừng mic" : "🎤 Mic"}</button>
           </div>
+          <div id="speechStatus" class="speech-status ${state.speechListening ? "active" : ""}">${escapeHtml(state.speechSupported ? (state.speechTranscript || "Bấm Mic để nói từ tiếng Hàn trực tiếp.") : "Mic chỉ hoạt động trên trình duyệt có hỗ trợ Speech Recognition. iOS nên dùng Safari mới nhất.")}</div>
         `;
       }
 
@@ -1529,7 +1997,7 @@
 
       html += `
           <div class="action-row">
-            ${!state.feedback ? `<button class="btn btn-dark" onclick="handleSubmit()">📝 Kiểm tra đáp án</button>` : `<button class="btn btn-primary" onclick="handleNext()">Câu tiếp theo</button>`}
+            ${state.mode === "flashcard" ? `` : (!state.feedback ? `<button class="btn btn-dark" onclick="handleSubmit()">📝 Kiểm tra đáp án</button>` : `<button class="btn btn-primary" onclick="handleNext()">Câu tiếp theo</button>`)}
           </div>
         </div>
       `;
@@ -1581,6 +2049,18 @@
       document.querySelectorAll("#modeTabs button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.mode === state.mode);
       });
+      document.querySelectorAll("#sectionPills .mode-pill").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.section === state.appSection);
+      });
+      document.querySelectorAll("#playTabs button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.playMode === state.playMode);
+      });
+      const isStudy = state.appSection === "study";
+      const isPlay = state.appSection === "play";
+      document.getElementById("modeTabs").classList.toggle("hidden", !isStudy);
+      document.getElementById("playTabs").classList.toggle("hidden", !isPlay);
+      document.querySelector('.stats-strip').classList.toggle('section-hidden', state.appSection !== 'study');
+      document.querySelector('.vocab-section').classList.toggle('section-hidden', false);
       document.getElementById("themeSelect").value = state.themeName;
       document.getElementById("fontSelect").value = state.fontName;
       document.getElementById("displayFontSelect").value = state.displayFontName;
@@ -1595,6 +2075,7 @@
       renderStats();
       renderQuestion();
       renderWords();
+      renderLookupResults();
     }
 
     document.getElementById("excelFile").addEventListener("change", (e) => {
@@ -1644,6 +2125,15 @@
       state.search = e.target.value;
       renderWords();
     });
+    document.getElementById("lookupInput").addEventListener("input", (e) => {
+      state.lookupQuery = e.target.value;
+      renderLookupResults();
+    });
+    document.getElementById("lookupBtn").addEventListener("click", () => applyLookup(state.lookupQuery));
+    document.getElementById("lookupCurrentBtn").addEventListener("click", () => {
+      const current = getCurrent();
+      applyLookup(current?.vocab || current?.meaning || "");
+    });
     document.getElementById("toggleFavoritesFilterBtn").addEventListener("click", () => {
       state.onlyFavorites = !state.onlyFavorites;
       renderWords();
@@ -1656,13 +2146,26 @@
         resetQuiz();
       });
     });
+    document.querySelectorAll("#sectionPills .mode-pill").forEach(btn => {
+      btn.addEventListener("click", () => selectSection(btn.dataset.section));
+    });
+    document.querySelectorAll("#playTabs button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        state.playMode = btn.dataset.playMode;
+        initMatchGame();
+        saveState();
+        render();
+      });
+    });
 
     window.addEventListener("keydown", (e) => {
       const active = document.activeElement;
       const activeTag = active?.tagName;
       const isTypingField = activeTag === "INPUT" || activeTag === "TEXTAREA";
       const isAnswerInput = active?.id === "answerInput";
-      const isChoiceMode = state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko";
+      const isChoiceMode = state.appSection === "study" && (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko");
+      const isFlashcardMode = state.appSection === "study" && state.mode === "flashcard";
+      const isPlayMode = state.appSection === "play";
 
       if (e.key === "/" && !isTypingField) {
         e.preventDefault();
@@ -1705,7 +2208,12 @@
         }
         if (!isTypingField) {
           e.preventDefault();
-          if (state.feedback) handleNext();
+          if (isPlayMode) {
+            return;
+          } else if (isFlashcardMode) {
+            if (state.flashcardFlipped) handleNext();
+            else toggleFlashcard(true);
+          } else if (state.feedback) handleNext();
           else if (isChoiceMode) {
             if (!state.selectedChoice) moveChoiceSelection(1);
             else handleSubmit();
@@ -1718,6 +2226,7 @@
     });
 
     initKoreanVoice();
+    initSpeechRecognition();
     loadState();
     render();
     resetQuiz();
