@@ -29,11 +29,23 @@
     body {
       font-family: var(--app-font);
       background:
-        radial-gradient(circle at top left, rgba(56,189,248,.06), transparent 18%),
-        radial-gradient(circle at bottom right, rgba(99,102,241,.08), transparent 22%),
-        linear-gradient(180deg, var(--bg) 0%, #081321 100%);
+        radial-gradient(circle at 12% 10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 24%),
+        radial-gradient(circle at 85% 12%, color-mix(in srgb, var(--primary-2) 16%, transparent), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(255,255,255,.03), transparent 30%),
+        linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 72%, black 28%) 100%);
       color: var(--text);
       min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(130deg, rgba(255,255,255,.03), transparent 30%),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.035), transparent 18%),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,.03), transparent 18%);
+      opacity: .85;
     }
 
     body[data-theme="dark-blue"] {}
@@ -64,6 +76,33 @@
       --primary: #60a5fa;
       --primary-2: #3b82f6;
     }
+    body[data-theme="aurora-glow"] {
+      --bg: #06131f;
+      --panel: #0d2031;
+      --border: #24516b;
+      --text: #f3fbff;
+      --muted: #9ed7d6;
+      --primary: #22d3ee;
+      --primary-2: #a78bfa;
+    }
+    body[data-theme="sunset-coral"] {
+      --bg: #1a1020;
+      --panel: #28162e;
+      --border: #5a344e;
+      --text: #fff7fb;
+      --muted: #efb0bf;
+      --primary: #fb7185;
+      --primary-2: #f59e0b;
+    }
+    body[data-theme="rose-night"] {
+      --bg: #140d17;
+      --panel: #21131f;
+      --border: #4f2b45;
+      --text: #fff6fb;
+      --muted: #d8abc8;
+      --primary: #f472b6;
+      --primary-2: #c084fc;
+    }
 
     body[data-font="jakarta"] { --app-font: 'Plus Jakarta Sans', Inter, Arial, sans-serif; }
     body[data-font="vietnam"] { --app-font: 'Be Vietnam Pro', Inter, Arial, sans-serif; }
@@ -78,7 +117,7 @@
       margin: 0 auto;
       padding: 24px;
       display: grid;
-      grid-template-columns: 290px minmax(0, 1fr);
+      grid-template-columns: 380px minmax(0, 1fr);
       gap: 24px;
     }
 
@@ -90,7 +129,7 @@
     }
 
     .sidebar {
-      padding: 18px;
+      padding: 22px;
       position: sticky;
       top: 20px;
       height: fit-content;
@@ -121,8 +160,8 @@
     .sidebar-sub { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.7; }
 
     .unit-panel {
-      margin-top: 4px;
-      padding: 16px;
+      margin-top: 8px;
+      padding: 18px;
       border-radius: 20px;
       border: 1px solid var(--border);
       background: linear-gradient(180deg, #0d1828, #0c1624);
@@ -241,20 +280,65 @@
     }
     .mode-pill.active { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #051321; }
 
-    .toolbar { padding: 18px 20px; margin-bottom: 18px; }
+    .toolbar {
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .toolbar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,.03), transparent 35%);
+    }
     .toolbar-row {
-      display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; align-items: center;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
     }
     .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .tabs button {
-      background: #112035; border: 1px solid #1d3657; color: #9db1ca; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer;
+      min-height: 42px;
+      background: #112035;
+      border: 1px solid #1d3657;
+      color: #c3d2e7;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: -.01em;
     }
     .tabs button.active {
       background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #061220; border-color: transparent; box-shadow: 0 10px 20px rgba(56,189,248,.18);
     }
-    .toolbar-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--border) 92%, white 8%);
+      background: color-mix(in srgb, var(--panel) 86%, black 14%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
     .select {
-      height: 40px; border-radius: 12px; border: 1px solid #22405f; padding: 0 12px; background: #0f1b2e; color: #f8fafc; font: inherit;
+      height: 42px;
+      border-radius: 14px;
+      border: 1px solid #22405f;
+      padding: 0 13px;
+      background: #0f1b2e;
+      color: #f8fafc;
+      font: inherit;
+      font-weight: 700;
+      min-width: 124px;
     }
     .progress-top-row {
       display: flex; justify-content: space-between; margin-top: 16px; margin-bottom: 8px; color: #7fb5e8; font-size: 14px;
@@ -278,16 +362,17 @@
     .question-text {
       font-family: var(--display-font);
       text-align: center;
-      font-size: clamp(30px, 5vw, 54px);
+      font-size: clamp(28px, 4.6vw, 52px);
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.2;
       letter-spacing: -.03em;
       margin: 14px auto 0;
-      max-width: min(100%, 900px);
+      max-width: min(100%, 920px);
       white-space: normal;
       overflow-wrap: anywhere;
       word-break: break-word;
       text-wrap: balance;
+      padding-inline: 8px;
     }
     .tone-emerald { color: #34d399; }
     .tone-violet {
@@ -348,27 +433,28 @@
     }
 
     .flashcard-wrap {
-      max-width: 760px;
+      max-width: 860px;
       margin: 24px auto 0;
-      perspective: 1400px;
+      perspective: 1600px;
     }
     .flashcard {
       position: relative;
+      height: clamp(320px, 44vw, 430px);
       min-height: 320px;
-      border-radius: 28px;
+      border-radius: 30px;
       cursor: pointer;
       transform-style: preserve-3d;
       transition: transform .5s ease, box-shadow .2s ease;
       box-shadow: 0 18px 40px rgba(0,0,0,.18);
     }
     .flashcard:hover { transform: translateY(-2px); }
-    .flashcard-wrap { max-width: 760px; margin: 22px auto 0; }
+    .flashcard-wrap { max-width: 860px; margin: 22px auto 0; }
     .flashcard.is-flipped { transform: rotateY(180deg); }
     .flashcard-face {
       position: absolute;
       inset: 0;
-      border-radius: 28px;
-      padding: 28px;
+      border-radius: 30px;
+      padding: clamp(22px, 4vw, 34px);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
       display: flex;
@@ -377,40 +463,48 @@
       align-items: center;
       text-align: center;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 96%, white 4%), color-mix(in srgb, var(--panel) 92%, black 8%));
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.07), transparent 24%),
+        linear-gradient(180deg, color-mix(in srgb, var(--panel) 96%, white 4%), color-mix(in srgb, var(--panel) 92%, black 8%));
+      overflow: auto;
+      scrollbar-width: thin;
     }
     .flashcard-face.back { transform: rotateY(180deg); }
-    .flashcard-kicker {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
+    .flashcard-kicker { display:none; }
     .flashcard-main {
       font-family: var(--display-font);
-      font-size: clamp(28px, 4.5vw, 52px);
+      font-size: clamp(36px, 6vw, 72px);
       font-weight: 800;
-      line-height: 1.18;
+      line-height: 1.08;
       overflow-wrap: anywhere;
       word-break: break-word;
+      max-width: 100%;
+      max-height: 100%;
+      overflow: auto;
+      padding: 10px 6px;
+      scrollbar-width: none;
     }
-    .flashcard-sub {
+    .flashcard-main::-webkit-scrollbar { display:none; }
+    .flashcard-sub { display:none; }
+    .flashcard-help { display:none; }
+    .flashcard-nav {
       margin-top: 16px;
-      font-size: 16px;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 88%;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      max-width: 860px;
+      margin-inline: auto;
     }
-    .flashcard-help {
+    .flashcard-counter {
       text-align: center;
       color: var(--muted);
-      margin-top: 14px;
-      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      font-size: 13px;
     }
     .flashcard-actions {
-      margin-top: 22px;
+      margin-top: 14px;
       display: flex;
       justify-content: center;
       gap: 12px;
@@ -478,6 +572,7 @@
       display: grid;
       grid-template-columns: 1fr;
       gap: 10px;
+      margin-top: 4px;
     }
 
     .stack-actions .btn,
@@ -486,7 +581,175 @@
       text-align: center;
     }
 
-    .card,
+
+
+    .subject-card {
+      padding: 16px;
+      margin-bottom: 14px;
+      border-radius: 24px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 96%, white 4%), color-mix(in srgb, var(--panel) 92%, black 8%));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 16px 28px rgba(0,0,0,.14);
+    }
+    .subject-card.active {
+      border-color: color-mix(in srgb, var(--primary) 56%, var(--border) 44%);
+      box-shadow: 0 18px 36px rgba(0,0,0,.18), 0 0 0 1px rgba(125,211,252,.12);
+    }
+    .subject-header {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .subject-main,
+    .lesson-main {
+      min-width: 0;
+      cursor: pointer;
+    }
+    .subject-title,
+    .lesson-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      margin: 0;
+    }
+    .subject-icon,
+    .lesson-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      line-height: 1;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.06);
+      transform: none;
+      flex: 0 0 auto;
+    }
+    .subject-title-text,
+    .lesson-title-text {
+      min-width: 0;
+      flex: 1;
+    }
+    .subject-name,
+    .lesson-name {
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: #fff;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lesson-name {
+      font-size: 15px;
+    }
+    .subject-source,
+    .lesson-source {
+      display: none;
+    }
+    .subject-actions,
+    .lesson-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border-radius: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      font-weight: 800;
+      flex: 0 0 auto;
+      background: color-mix(in srgb, var(--panel) 88%, black 12%);
+      border: 1px solid color-mix(in srgb, var(--border) 90%, white 10%);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .icon-btn:hover {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--panel) 80%, var(--primary) 20%);
+    }
+    .lesson-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    .lesson-row {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--border) 92%, white 8%);
+      background: color-mix(in srgb, var(--panel) 90%, black 10%);
+      margin-left: 0;
+    }
+    .lesson-row.active {
+      border-color: color-mix(in srgb, var(--primary) 56%, var(--border) 44%);
+      background: linear-gradient(135deg, rgba(92,200,255,.18), rgba(147,128,255,.22));
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(56,189,248,.14);
+    }
+    .lesson-row.active .lesson-name,
+    .lesson-row.active .icon-btn {
+      color: #fff;
+    }
+    .lesson-row.active .icon-btn {
+      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.12);
+    }
+    .inline-edit-row.compact {
+      display: grid;
+      gap: 10px;
+    }
+    .inline-edit-row.compact.single-name {
+      grid-template-columns: minmax(0,1fr);
+    }
+    .inline-edit-row.compact .text-input {
+      height: 44px;
+      min-width: 0;
+    }
+    .inline-edit-actions.compact {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .inline-edit-actions.compact .btn {
+      min-width: 84px;
+      padding: 10px 12px;
+    }
+    @media (max-width: 720px) {
+      .sidebar { padding: 18px; }
+      .subject-card { padding: 14px; }
+      .subject-name { font-size: 16px; }
+      .lesson-name { font-size: 14px; }
+      .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        font-size: 14px;
+      }
+      .subject-actions,
+      .lesson-actions {
+        gap: 6px;
+      }
+    }
+
+.card,
     .toolbar,
     .question-card,
     .mini-box,
@@ -916,19 +1179,48 @@
       .lookup-bar .text-input { grid-column: 1 / -1; }
       .lookup-close { grid-column: 2; justify-self: end; }
     }
+    .inline-edit-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      margin-top:10px;
+    }
+    .inline-edit-row .text-input {
+      min-width: 0;
+      flex: 1 1 220px;
+      height: 44px;
+    }
+    .inline-edit-actions {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .mic-btn {
+      min-width: 54px;
+      padding-inline: 14px;
+      font-weight: 800;
+    }
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #fb7185, #f43f5e);
+      border-color: transparent;
+      color: white;
+      box-shadow: 0 12px 24px rgba(244,63,94,.24);
+    }
     .speech-status {
       margin-top: 10px;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.5;
       text-align: center;
+      min-height: 18px;
     }
     .speech-status.active {
       color: #7dd3fc;
     }
 
     @media (min-width: 1180px) {
-      .app-shell { max-width: 1480px; grid-template-columns: 340px minmax(0, 1fr); gap: 28px; padding: 28px; }
+      .app-shell { max-width: 1480px; grid-template-columns: 420px minmax(0, 1fr); gap: 28px; padding: 28px; }
       .sidebar { padding: 22px; }
       .toolbar { padding: 20px 22px; }
       .question-card { padding: 42px 40px 34px; }
@@ -954,6 +1246,9 @@
 
     @media (max-width: 720px) {
       .app-shell { padding: 16px; }
+      .subject-header, .lesson-row { grid-template-columns: 1fr; }
+      .subject-actions, .lesson-actions { justify-content: flex-start; }
+      .icon-btn { width: 40px; height: 40px; }
       .stats-strip { grid-template-columns: 1fr; }
       .toolbar-row, .vocab-head-row { flex-direction: column; align-items: stretch; }
       .question-text { font-size: clamp(24px, 8vw, 40px); line-height: 1.18; }
@@ -962,6 +1257,12 @@
       .sidebar { padding: 16px; }
       .unit-panel { padding: 14px; }
       .btn-primary { width: 100%; }
+      .toolbar-actions { padding: 8px; gap: 8px; }
+      .toolbar-actions .select,
+      .toolbar-actions .btn { width: 100%; }
+      .flashcard { height: clamp(300px, 72vw, 380px); }
+      .flashcard-nav { grid-template-columns: 1fr 1fr; }
+      .flashcard-counter { grid-column: 1 / -1; order: -1; }
     }
   </style>
 </head>
@@ -1018,6 +1319,9 @@
               <option value="violet-night">Violet Night</option>
               <option value="forest-night">Forest Night</option>
               <option value="slate-night">Slate Night</option>
+              <option value="aurora-glow">Aurora Glow</option>
+              <option value="sunset-coral">Sunset Coral</option>
+              <option value="rose-night">Rose Night</option>
             </select>
             <select id="fontSelect" class="select">
               <option value="jakarta">Plus Jakarta Sans</option>
@@ -1064,7 +1368,7 @@
 
       <section class="vocab-section">
         <div class="vocab-head-row">
-          <h3 class="vocab-title">Từ vựng trong bài hiện tại (<span id="statWords">0</span>)</h3>
+          <h3 class="vocab-title">Từ vựng trong bài hiện tại</h3>
           <div class="vocab-head-actions">
             <span class="muted-inline">⭐ <span id="chipFavCountInline">0</span></span>
             <button class="btn btn-outline" id="addWordBtn">＋ Thêm từ vào bài</button>
@@ -1080,7 +1384,6 @@
 
 
           <div class="chips">
-            <div class="chip" id="chipCount">0 từ</div>
             <div class="chip" id="chipFav">0 yêu thích</div>
             <div class="chip" id="chipWrong">0 cần ôn</div>
           </div>
@@ -1190,6 +1493,8 @@
       lookupBusy: false,
       lookupModalOpen: false,
       lookupOnlineCache: {},
+      inlineEdit: null,
+      micSupportedChecked: false,
     };
 
     function normalizeText(text) {
@@ -1562,42 +1867,44 @@
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         state.speechSupported = false;
+        state.micSupportedChecked = true;
         return;
       }
       try {
         const recognition = new SpeechRecognition();
         recognition.lang = 'ko-KR';
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 3;
         recognition.continuous = false;
         recognition.onstart = () => {
           state.speechListening = true;
-          state.speechTranscript = 'Đang nghe... hãy nói rõ một từ hoặc cụm tiếng Hàn';
+          state.speechTranscript = 'Đang nghe...';
           renderQuestion();
         };
         recognition.onresult = (event) => {
-          let transcript = '';
-          let finalTranscript = '';
+          const choices = [];
           for (let i = event.resultIndex; i < event.results.length; i += 1) {
-            const piece = (event.results[i][0]?.transcript || '').trim();
-            transcript += piece + ' ';
-            if (event.results[i].isFinal) finalTranscript += piece + ' ';
+            const piece = (event.results[i][0]?.transcript || '').trim().replace(/\s+/g, '');
+            if (piece) choices.push(piece);
           }
-          transcript = (finalTranscript || transcript).trim().replace(/\s+/g, '');
+          const transcript = choices[0] || '';
           state.answer = transcript;
-          state.speechTranscript = transcript ? `Bạn vừa nói: ${transcript}` : 'Không nghe rõ, hãy thử lại.';
+          state.speechTranscript = transcript;
           const input = document.getElementById('answerInput');
           if (input) input.value = transcript;
-          const status = document.getElementById('speechStatus');
-          if (status) status.textContent = state.speechTranscript;
+          if (state.mode === 'listening' && transcript) {
+            setTimeout(() => handleSubmit(), 120);
+          } else {
+            renderQuestion();
+          }
         };
         recognition.onerror = (event) => {
           state.speechListening = false;
           state.speechTranscript = event.error === 'not-allowed'
-            ? 'Bạn cần cho phép dùng microphone trong Safari/trình duyệt.'
+            ? 'Chưa cấp quyền mic'
             : event.error === 'no-speech'
-            ? 'Không nghe thấy giọng nói. Hãy thử lại và nói gần micro hơn.'
-            : 'Micro chưa dùng được trên thiết bị hoặc trình duyệt này.';
+            ? 'Không nghe rõ'
+            : 'Mic lỗi';
           renderQuestion();
         };
         recognition.onend = () => {
@@ -1606,15 +1913,18 @@
         };
         state.speechRecognition = recognition;
         state.speechSupported = true;
+        state.micSupportedChecked = true;
       } catch (err) {
         console.error(err);
         state.speechSupported = false;
+        state.micSupportedChecked = true;
       }
     }
 
     function toggleSpeechInput() {
+      if (!state.micSupportedChecked) initSpeechRecognition();
       if (!state.speechSupported || !state.speechRecognition) {
-        state.speechTranscript = 'Trình duyệt này chưa hỗ trợ micro trực tiếp. Trên iOS, nên thử Safari mới nhất.';
+        state.speechTranscript = 'Thiết bị chưa hỗ trợ mic';
         renderQuestion();
         return;
       }
@@ -1629,7 +1939,7 @@
       } catch (err) {
         console.error(err);
         state.speechListening = false;
-        state.speechTranscript = 'Không thể khởi động micro. Hãy thử lại.';
+        state.speechTranscript = 'Mic chưa sẵn sàng';
         renderQuestion();
       }
     }
@@ -1736,7 +2046,20 @@
         const chosen = koreanVoices.find(v => (v.voiceURI || v.name) === state.selectedVoiceURI);
         if (chosen) return chosen;
       }
-      return koreanVoices[0] || null;
+      const scored = [...koreanVoices].sort((a, b) => scoreVoice(b) - scoreVoice(a));
+      return scored[0] || null;
+    }
+
+    function scoreVoice(voice) {
+      const name = String(voice?.name || '').toLowerCase();
+      let score = 0;
+      if (name.includes('google')) score += 6;
+      if (name.includes('microsoft')) score += 5;
+      if (name.includes('natural')) score += 5;
+      if (name.includes('premium')) score += 4;
+      if (name.includes('female')) score += 1;
+      if ((voice?.lang || '').toLowerCase().startsWith('ko')) score += 4;
+      return score;
     }
 
     function initKoreanVoice() {
@@ -1755,18 +2078,42 @@
       window.speechSynthesis.onvoiceschanged = pickVoice;
     }
 
+    function playSpeakCue() {
+      const ctx = ensureAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc1.type = 'sine';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(740, now);
+      osc2.frequency.setValueAtTime(1110, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.035, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+      osc1.start(now);
+      osc2.start(now + 0.01);
+      osc1.stop(now + 0.14);
+      osc2.stop(now + 0.16);
+    }
+
     function speakKorean(text, rate = 0.9) {
       if (!window.speechSynthesis || !text) return;
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(String(text).trim());
       utter.lang = "ko-KR";
-      utter.rate = Math.max(0.65, Math.min(Number(rate) || 0.9, 1.05));
-      utter.pitch = 1;
+      utter.rate = Math.max(0.65, Math.min(Number(rate) || 0.9, 1.08));
+      utter.pitch = Number(rate) < 0.8 ? 0.98 : 1.06;
       utter.volume = 1;
       const preferred = getPreferredKoreanVoice();
       if (preferred) utter.voice = preferred;
       state.koreanVoice = preferred;
-      window.speechSynthesis.speak(utter);
+      playSpeakCue();
+      setTimeout(() => window.speechSynthesis.speak(utter), 45);
     }
 
     function ensureAudioContext() {
@@ -1841,20 +2188,59 @@
       resetQuiz();
     }
 
-    function renameSubject(index) {
-      const subject = state.subjects[index];
-      if (!subject) return;
-      const next = prompt("Đổi tên môn học:", subject.name);
-      if (!next || !next.trim()) return;
-      subject.name = next.trim();
-      saveState();
+    function startInlineEdit(kind, payload = {}) {
+      state.inlineEdit = { kind, ...payload };
       render();
+      requestAnimationFrame(() => {
+        const firstInput = document.querySelector('.inline-edit-row input');
+        if (firstInput) firstInput.focus();
+      });
+    }
+
+    function cancelInlineEdit() {
+      state.inlineEdit = null;
+      render();
+    }
+
+    function saveInlineEdit() {
+      const edit = state.inlineEdit;
+      if (!edit) return;
+      if (edit.kind === 'subject') {
+        const subject = state.subjects[edit.subjectIndex];
+        if (!subject) return;
+        const name = document.getElementById('inlineSubjectName')?.value?.trim();
+        if (name) subject.name = name;
+      } else if (edit.kind === 'lesson') {
+        const lesson = state.subjects[edit.subjectIndex]?.lessons?.[edit.lessonIndex];
+        if (!lesson) return;
+        const name = document.getElementById('inlineLessonName')?.value?.trim();
+        if (name) lesson.name = name;
+      } else if (edit.kind === 'word') {
+        const lesson = getActiveLesson();
+        const word = lesson?.words.find(item => item.id === edit.wordId);
+        if (!word) return;
+        const vocab = document.getElementById(`inlineWordVocab-${edit.wordId}`)?.value?.trim();
+        const meaning = document.getElementById(`inlineWordMeaning-${edit.wordId}`)?.value?.trim();
+        const wasFavorite = state.favorites.includes(edit.originalVocab);
+        if (vocab) word.vocab = vocab;
+        if (meaning) word.meaning = meaning;
+        state.favorites = state.favorites.filter(item => item !== edit.originalVocab);
+        if (wasFavorite && word.vocab) state.favorites.push(word.vocab);
+      }
+      state.inlineEdit = null;
+      saveState();
+      resetQuiz();
+      render();
+    }
+
+    function renameSubject(index) {
+      startInlineEdit('subject', { subjectIndex: index });
     }
 
     function deleteSubject(index) {
       const subject = state.subjects[index];
       if (!subject) return;
-      if (!confirm(`Xóa môn học "${subject.name}" và toàn bộ các bài bên trong?`)) return;
+      if (!confirm(`Bạn chắc chắn muốn xóa folder "${subject.name}" và toàn bộ bài bên trong?`)) return;
       state.subjects.splice(index, 1);
       if (!state.subjects.length) state.subjects = JSON.parse(JSON.stringify(defaultSubjects));
       state.activeSubjectIndex = Math.min(state.activeSubjectIndex, state.subjects.length - 1);
@@ -1864,20 +2250,14 @@
     }
 
     function renameLesson(subjectIndex, lessonIndex) {
-      const lesson = state.subjects[subjectIndex]?.lessons?.[lessonIndex];
-      if (!lesson) return;
-      const next = prompt("Đổi tên bài:", lesson.name);
-      if (!next || !next.trim()) return;
-      lesson.name = next.trim();
-      saveState();
-      render();
+      startInlineEdit('lesson', { subjectIndex, lessonIndex });
     }
 
     function deleteLesson(subjectIndex, lessonIndex) {
       const subject = state.subjects[subjectIndex];
       const lesson = subject?.lessons?.[lessonIndex];
       if (!subject || !lesson) return;
-      if (!confirm(`Xóa bài "${lesson.name}"?`)) return;
+      if (!confirm(`Bạn chắc chắn muốn xóa bài "${lesson.name}"?`)) return;
       subject.lessons.splice(lessonIndex, 1);
       if (!subject.lessons.length) {
         subject.lessons.push({ id: makeId("lesson"), name: "Bài 1", sourceFile: "Tạo thủ công", words: [] });
@@ -2016,17 +2396,9 @@
     }
 
     function editWord(wordId) {
-      const lesson = getActiveLesson();
-      const word = lesson?.words.find(w => w.id === wordId);
+      const word = getActiveLesson()?.words.find(item => item.id === wordId);
       if (!word) return;
-      const nextVocab = prompt("Sửa từ tiếng Hàn:", word.vocab);
-      if (!nextVocab || !nextVocab.trim()) return;
-      const nextMeaning = prompt("Sửa nghĩa tiếng Việt:", word.meaning);
-      if (!nextMeaning || !nextMeaning.trim()) return;
-      word.vocab = nextVocab.trim();
-      word.meaning = nextMeaning.trim();
-      saveState();
-      resetQuiz();
+      startInlineEdit('word', { wordId, originalVocab: word.vocab });
     }
 
     function deleteWord(wordId) {
@@ -2066,21 +2438,19 @@
       render();
     }
 
-    function handleNext() {
-      const nextIndex = state.currentIndex + 1;
+    function jumpToCard(targetIndex) {
       state.answer = "";
       state.selectedChoice = "";
       state.feedback = null;
       state.flashcardFlipped = false;
       state.currentOptions = [];
 
-      if (nextIndex >= state.quizOrder.length) {
+      if (!state.quizOrder.length) {
         const reshuffled = shuffleArray(getStudyPool());
         state.quizOrder = reshuffled.length ? reshuffled : shuffleArray(getWords());
-        state.currentIndex = 0;
-      } else {
-        state.currentIndex = nextIndex;
       }
+      const total = state.quizOrder.length;
+      state.currentIndex = total ? (targetIndex + total) % total : 0;
 
       const current = getCurrent();
       if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
@@ -2092,6 +2462,14 @@
         setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 160);
       }
       render();
+    }
+
+    function handleNext() {
+      jumpToCard(state.currentIndex + 1);
+    }
+
+    function handlePrevious() {
+      jumpToCard(state.currentIndex - 1);
     }
 
     function selectChoice(choice) {
@@ -2124,41 +2502,66 @@
       const unitList = document.getElementById("unitList");
       const activeSubject = getActiveSubject();
       const activeLesson = getActiveLesson();
+      const edit = state.inlineEdit;
 
       unitList.innerHTML = state.subjects.map((subject, subjectIndex) => {
         const isActiveSubject = subjectIndex === state.activeSubjectIndex;
+        const subjectEditing = edit?.kind === 'subject' && edit.subjectIndex === subjectIndex;
         const lessonItems = (subject.lessons || []).map((lesson, lessonIndex) => {
           const isActiveLesson = isActiveSubject && lessonIndex === state.activeLessonIndex;
+          const lessonEditing = edit?.kind === 'lesson' && edit.subjectIndex === subjectIndex && edit.lessonIndex === lessonIndex;
           return `
-            <div class="unit-item ${isActiveLesson ? "active" : ""}" style="margin-top:8px; margin-left:10px; padding:12px;">
-              <div onclick="selectLesson(${subjectIndex}, ${lessonIndex})" style="min-width:0; cursor:pointer;">
-                <div class="unit-name" style="font-size:14px;">📘 ${escapeHtml(lesson.name)}</div>
-                <div class="unit-file">${escapeHtml(lesson.sourceFile || subject.sourceFile || "Dữ liệu")}</div>
-                <div class="unit-meta">${lesson.words.length} từ</div>
+            <div class="lesson-row ${isActiveLesson ? "active" : ""}">
+              <div class="lesson-main" onclick="${lessonEditing ? '' : `selectLesson(${subjectIndex}, ${lessonIndex})`}" style="cursor:${lessonEditing ? 'default' : 'pointer'};">
+                ${lessonEditing ? `
+                  <div class="inline-edit-row compact single-name">
+                    <input id="inlineLessonName" class="text-input" value="${escapeHtml(lesson.name)}" placeholder="Tên bài" />
+                    <div class="inline-edit-actions compact">
+                      <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
+                      <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+                    </div>
+                  </div>` : `
+                  <div class="lesson-title">
+                    <div class="lesson-icon">📘</div>
+                    <div class="lesson-title-text">
+                      <div class="lesson-name">${escapeHtml(lesson.name)}</div>
+                    </div>
+                  </div>`}
               </div>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <button class="btn btn-ghost" title="Đổi tên bài" onclick="renameLesson(${subjectIndex}, ${lessonIndex})">✏️</button>
-                <button class="btn btn-ghost" title="Xóa bài" onclick="deleteLesson(${subjectIndex}, ${lessonIndex})">🗑️</button>
+              <div class="lesson-actions">
+                <button class="btn icon-btn" title="Đổi tên bài" onclick="renameLesson(${subjectIndex}, ${lessonIndex})">✏️</button>
+                <button class="btn icon-btn" title="Xóa bài" onclick="deleteLesson(${subjectIndex}, ${lessonIndex})">🗑️</button>
               </div>
             </div>
           `;
         }).join("");
 
         return `
-          <div class="word-item" style="padding:14px; margin-bottom:10px;">
-            <div class="word-head">
-              <div onclick="state.activeSubjectIndex=${subjectIndex}; state.activeLessonIndex=Math.min(state.activeLessonIndex, (state.subjects[${subjectIndex}].lessons.length||1)-1); saveState(); render();" style="cursor:pointer; min-width:0;">
-                <div class="word-vocab" style="font-size:18px;">📁 ${escapeHtml(subject.name)}</div>
-                <div class="word-pronounce">${escapeHtml(subject.sourceFile || "Folder môn học")}</div>
-                <div class="word-note" style="margin-top:6px;">${subject.lessons.length} bài từ vựng</div>
+          <div class="subject-card ${isActiveSubject ? "active" : ""}">
+            <div class="subject-header">
+              <div class="subject-main" onclick="${subjectEditing ? '' : `state.activeSubjectIndex=${subjectIndex}; state.activeLessonIndex=Math.min(state.activeLessonIndex, (state.subjects[${subjectIndex}].lessons.length||1)-1); saveState(); render();`}" style="cursor:${subjectEditing ? 'default' : 'pointer'};">
+                ${subjectEditing ? `
+                  <div class="inline-edit-row compact single-name">
+                    <input id="inlineSubjectName" class="text-input" value="${escapeHtml(subject.name)}" placeholder="Tên folder" />
+                    <div class="inline-edit-actions compact">
+                      <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
+                      <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+                    </div>
+                  </div>` : `
+                  <div class="subject-title">
+                    <div class="subject-icon">📁</div>
+                    <div class="subject-title-text">
+                      <div class="subject-name">${escapeHtml(subject.name)}</div>
+                    </div>
+                  </div>`}
               </div>
-              <div class="word-actions">
-                <button class="btn btn-ghost" title="Thêm bài" onclick="state.activeSubjectIndex=${subjectIndex}; createLesson();">＋</button>
-                <button class="btn btn-ghost" title="Đổi tên môn học" onclick="renameSubject(${subjectIndex})">✏️</button>
-                <button class="btn btn-ghost" title="Xóa môn học" onclick="deleteSubject(${subjectIndex})">🗑️</button>
+              <div class="subject-actions">
+                <button class="btn icon-btn" title="Thêm bài" onclick="state.activeSubjectIndex=${subjectIndex}; createLesson();">＋</button>
+                <button class="btn icon-btn" title="Đổi tên môn học" onclick="renameSubject(${subjectIndex})">✏️</button>
+                <button class="btn icon-btn" title="Xóa môn học" onclick="deleteSubject(${subjectIndex})">🗑️</button>
               </div>
             </div>
-            ${lessonItems || `<div style="margin-top:10px; color:var(--muted);">Chưa có bài nào trong folder này.</div>`}
+            <div class="lesson-list">${lessonItems || ``}</div>
           </div>
         `;
       }).join("");
@@ -2172,7 +2575,6 @@
       const progress = state.quizOrder.length ? Math.round((state.completed / state.quizOrder.length) * 100) : 0;
       const wrongCount = Math.max(state.completed - state.score, 0);
 
-      document.getElementById("statWords").textContent = totalWords;
       document.getElementById("miniProgress").textContent = `${progress}%`;
       document.getElementById("miniScore").textContent = `${state.score}/${state.completed || 0}`;
       document.getElementById("miniWrong").textContent = wrongCount;
@@ -2257,7 +2659,7 @@
         return;
       }
       if (state.appSection === "view") {
-        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chế độ xem từ vựng</div><div class="question-text tone-sky">${getWords().length} từ</div><div class="flashcard-help">Cuộn xuống bên dưới để xem toàn bộ từ vựng, nghe phát âm, sửa hoặc xóa từ.</div></div>`;
+        area.innerHTML = `<div class="card question-card"></div>`;
         return;
       }
       if (state.appSection === "play") {
@@ -2267,7 +2669,7 @@
         }
         if (!state.matchPairs.length) initMatchGame();
         const done = state.matchMatchedCount >= Math.min(6, getWords().length);
-        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div>Bạn đã ghép đúng hết các cặp từ. Bấm chơi lại để trộn bộ mới.</div></div>` : `<div class="flashcard-help">Mỗi lượt chọn 1 từ tiếng Hàn và 1 nghĩa tiếng Việt tương ứng.</div>`}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button></div></div></div>`;
+        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div></div>` : ``}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button></div></div></div>`;
         return;
       }
       if (!current) {
@@ -2289,11 +2691,12 @@
       else if (state.mode === "flashcard") label = "Flash card từ vựng";
       else label = "Nghe phát âm rồi gõ hoặc bấm micro để nói lại từ tiếng Hàn";
 
+      const compactHeader = state.mode === "flashcard";
       let html = `
         <div class="card question-card">
-          <div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div>
+          ${compactHeader ? `` : `<div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div>
           <div class="question-label">${label}</div>
-          <div class="question-text ${questionToneClass()}">${escapeHtml(title)}</div>
+          <div class="question-text ${questionToneClass()}">${escapeHtml(title)}</div>`}
 
           <div class="question-head-actions">
             <button class="btn btn-outline" onclick='toggleFavorite(${JSON.stringify(current.vocab)})'>⭐ ${state.favorites.includes(current.vocab) ? "Đã lưu" : "Yêu thích"}</button>
@@ -2331,22 +2734,26 @@
                 <div class="flashcard-main tone-violet">${escapeHtml(current.meaning)}</div>
               </div>
             </div>
-            
+          </div>
+          <div class="flashcard-nav">
+            <button class="btn btn-outline" onclick="handlePrevious()">← Thẻ trước</button>
+            <div class="flashcard-counter">${state.currentIndex + 1} / ${Math.max(state.quizOrder.length, 1)} thẻ</div>
+            <button class="btn btn-outline" onclick="handleNext()">Thẻ sau →</button>
           </div>
           <div class="flashcard-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe từ</button>
-            <button class="btn btn-outline" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
-            <button class="btn btn-primary" onclick="handleNext()">Thẻ tiếp theo</button>
+            <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, 0.72)'>🐢 Đọc chậm</button>
+            <button class="btn btn-primary" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
           </div>
         `;
       } else {
         html += `
           <div class="input-row">
             <input id="answerInput" class="text-input" type="text" value="${escapeHtml(state.answer)}" placeholder="Nhập từ tiếng Hàn..." oninput="updateAnswer(this.value)" />
-            ${state.mode === "listening" ? `<button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Phát âm</button>` : ``}
-            <button class="btn btn-outline" onclick="toggleSpeechInput()">${state.speechListening ? "🛑 Dừng mic" : "🎤 Mic"}</button>
+            ${state.mode === "listening" ? `<button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊</button>` : ``}
+            <button class="btn btn-outline mic-btn ${state.speechListening ? "listening" : ""}" onclick="toggleSpeechInput()">${state.speechListening ? "●" : "🎤"}</button>
           </div>
-          <div id="speechStatus" class="speech-status ${state.speechListening ? "active" : ""}">${escapeHtml(state.speechSupported ? (state.speechTranscript || "Bấm Mic để nói. Hệ thống sẽ tự điền kết quả vào ô trả lời.") : "Mic chỉ hoạt động trên trình duyệt có hỗ trợ Speech Recognition. iOS nên dùng Safari mới nhất.")}</div>
+          <div id="speechStatus" class="speech-status ${state.speechListening ? "active" : ""}">${escapeHtml(state.speechTranscript || "")}</div>
         `;
       }
 
@@ -2382,7 +2789,6 @@
       let result = [...words];
       if (state.onlyFavorites) result = result.filter(w => state.favorites.includes(w.vocab));
       if (q) result = result.filter(w => normalizeText(w.vocab).includes(q) || normalizeText(w.meaning).includes(q));
-      document.getElementById("chipCount").textContent = `${result.length} từ`;
       const list = document.getElementById("wordList");
       if (!lesson) {
         list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--muted); border:1px dashed var(--border); border-radius:16px;">Chưa có bài nào được chọn.</div>`;
@@ -2392,12 +2798,23 @@
         list.innerHTML = `<div style="padding:20px; text-align:center; color:var(--muted); border:1px dashed var(--border); border-radius:16px;">Không tìm thấy từ phù hợp.</div>`;
         return;
       }
-      list.innerHTML = result.map(w => `
+      list.innerHTML = result.map(w => {
+        const wordEditing = state.inlineEdit?.kind === 'word' && state.inlineEdit.wordId === w.id;
+        return `
         <div class="word-item">
           <div class="word-head">
-            <div>
-              <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""}</div>
-              <div class="word-pronounce">${escapeHtml(subject?.name || "Môn học")} • ${escapeHtml(lesson?.name || "Bài")}</div>
+            <div style="min-width:0; flex:1;">
+              ${wordEditing ? `
+                <div class="inline-edit-row">
+                  <input id="inlineWordVocab-${w.id}" class="text-input" value="${escapeHtml(w.vocab)}" placeholder="Từ tiếng Hàn" />
+                  <input id="inlineWordMeaning-${w.id}" class="text-input" value="${escapeHtml(w.meaning)}" placeholder="Nghĩa tiếng Việt" />
+                  <div class="inline-edit-actions">
+                    <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
+                    <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+                  </div>
+                </div>` : `
+                <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""}</div>
+                <div class="word-meaning">${escapeHtml(w.meaning)}</div>`}
             </div>
             <div class="word-actions">
               <button class="btn btn-ghost" onclick='toggleFavorite(${JSON.stringify(w.vocab)})'>⭐</button>
@@ -2406,10 +2823,8 @@
               <button class="btn btn-ghost" onclick='deleteWord(${JSON.stringify(w.id)})'>🗑️</button>
             </div>
           </div>
-          <div class="word-meaning">${escapeHtml(w.meaning)}</div>
-          <div class="word-note">Nguồn: ${escapeHtml(lesson?.sourceFile || "Dữ liệu mẫu")}</div>
-        </div>
-      `).join("");
+        </div>`;
+      }).join("");
     }
 
     function renderPanels() {
@@ -2589,6 +3004,18 @@
       if ((e.key === "ArrowLeft" || e.key === "ArrowUp") && isChoiceMode && !isTypingField) {
         e.preventDefault();
         moveChoiceSelection(-1);
+        return;
+      }
+
+      if (isFlashcardMode && !isTypingField && e.key === "ArrowRight") {
+        e.preventDefault();
+        handleNext();
+        return;
+      }
+
+      if (isFlashcardMode && !isTypingField && e.key === "ArrowLeft") {
+        e.preventDefault();
+        handlePrevious();
         return;
       }
 
