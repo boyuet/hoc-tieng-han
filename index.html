@@ -433,12 +433,16 @@
     }
 
     .flashcard-wrap {
+      width: min(100%, 860px);
       max-width: 860px;
       margin: 24px auto 0;
       perspective: 1600px;
+      align-self: center;
     }
     .flashcard {
       position: relative;
+      display: block;
+      width: 100%;
       height: clamp(320px, 44vw, 430px);
       min-height: 320px;
       border-radius: 30px;
@@ -448,7 +452,7 @@
       box-shadow: 0 18px 40px rgba(0,0,0,.18);
     }
     .flashcard:hover { transform: translateY(-2px); }
-    .flashcard-wrap { max-width: 860px; margin: 22px auto 0; }
+    .flashcard-wrap { width: min(100%, 860px); max-width: 860px; margin: 22px auto 0; }
     .flashcard.is-flipped { transform: rotateY(180deg); }
     .flashcard-face {
       position: absolute;
@@ -473,7 +477,7 @@
     .flashcard-kicker { display:none; }
     .flashcard-main {
       font-family: var(--display-font);
-      font-size: clamp(36px, 6vw, 72px);
+      font-size: clamp(32px, 5.6vw, 68px);
       font-weight: 800;
       line-height: 1.08;
       overflow-wrap: anywhere;
@@ -509,6 +513,18 @@
       justify-content: center;
       gap: 12px;
       flex-wrap: wrap;
+    }
+
+    .flashcard-face {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 16px 32px rgba(0,0,0,.18);
+    }
+
+    .flashcard,
+    .flashcard-face,
+    .choice,
+    .btn {
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .stats-strip {
@@ -1009,14 +1025,24 @@
     }
 
     .section-hidden { display: none !important; }
-    .match-wrap { max-width: 960px; margin: 20px auto 0; }
-    .match-board { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-top: 18px; }
-    .match-card { min-height: 76px; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 92%, black 8%); color: var(--text); font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+    .match-wrap { width: min(100%, 1320px); max-width: 1320px; margin: 22px auto 0; }
+    .match-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 18px; }
+    .match-card { min-height: 92px; padding: 18px 18px; border-radius: 20px; border: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 92%, black 8%); color: var(--text); font: inherit; font-size: 16px; font-weight: 800; line-height: 1.35; cursor: pointer; box-shadow: 0 8px 18px rgba(0,0,0,.12); }
     .match-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(125,211,252,.18), 0 16px 26px rgba(56,189,248,.16); transform: translateY(-1px); }
     .match-card.matched { opacity: .45; border-color: var(--success); pointer-events: none; }
     .match-card.wrong { border-color: var(--danger); }
-    .match-top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:14px; }
-    @media (max-width: 720px) { .match-board { grid-template-columns: 1fr; } }
+    .match-top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:15px; font-weight:700; }
+    .judge-wrap { width: min(100%, 1080px); max-width: 1080px; margin: 18px auto 0; display: grid; gap: 18px; }
+    .judge-top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:15px; font-weight:700; }
+    .judge-card { padding: 28px 26px; border-radius: 24px; border: 1px solid var(--border); background: color-mix(in srgb, var(--panel) 92%, black 8%); box-shadow: 0 14px 28px rgba(0,0,0,.14); display:grid; gap:18px; }
+    .judge-korean { text-align:center; font-family: var(--display-font); font-size: clamp(30px, 4.2vw, 56px); font-weight: 800; line-height: 1.12; color: var(--text); }
+    .judge-divider { text-align:center; color: var(--muted); font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .judge-meaning { text-align:center; font-size: clamp(28px, 4vw, 50px); font-weight: 800; line-height: 1.16; letter-spacing: -.02em; color: #9fd7ff; padding-bottom: .12em; }
+    .judge-actions { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .judge-btn { min-height: 72px; border-radius: 18px; font-size: 20px; font-weight: 800; }
+    .judge-btn.true { background: linear-gradient(180deg, rgba(34,197,94,.16), rgba(34,197,94,.08)); border: 1px solid rgba(34,197,94,.42); color: #dcfce7; }
+    .judge-btn.false { background: linear-gradient(180deg, rgba(244,63,94,.16), rgba(244,63,94,.08)); border: 1px solid rgba(244,63,94,.42); color: #ffe4e6; }
+    @media (max-width: 720px) { .match-board, .judge-actions { grid-template-columns: 1fr; } .match-card { min-height: 82px; } }
 
     .lookup-result {
       display: grid;
@@ -1230,12 +1256,12 @@
       .input-row { max-width: 860px; }
       .stats-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
       .word-list { max-height: none; }
-      .flashcard-wrap { max-width: 860px; }
-      .flashcard { min-height: 330px; }
-      .flashcard-main { font-size: clamp(42px, 4vw, 62px); }
+      .flashcard-wrap { width: min(100%, 720px); max-width: 720px; }
+      .flashcard { min-height: 210px; }
+      .flashcard-main { font-size: clamp(38px, 3.8vw, 58px); }
       .flashcard-actions { justify-content: center; }
-      .match-wrap { max-width: 1050px; margin-inline: auto; }
-      .match-board { grid-template-columns: 1fr 1fr 1fr; }
+      .match-wrap { width: min(100%, 1360px); max-width: 1360px; margin-inline: auto; }
+      .match-board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
 
@@ -1260,21 +1286,1217 @@
       .toolbar-actions { padding: 8px; gap: 8px; }
       .toolbar-actions .select,
       .toolbar-actions .btn { width: 100%; }
-      .flashcard { height: clamp(300px, 72vw, 380px); }
+      .flashcard { height: clamp(190px, 54vw, 250px); min-height: 190px; }
       .flashcard-nav { grid-template-columns: 1fr 1fr; }
       .flashcard-counter { grid-column: 1 / -1; order: -1; }
     }
+  
+
+    /* ===== optimized layout & system polish ===== */
+    html { scroll-behavior: smooth; }
+
+    body { overflow-x: hidden; }
+
+    .app-shell {
+      width: min(100vw - 20px, 1920px);
+      max-width: 1920px;
+      margin: 0 auto;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: clamp(430px, 28vw, 540px) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+      min-height: 100vh;
+    }
+
+    .card {
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .sidebar {
+      width: 100%;
+      padding: 16px;
+      position: sticky;
+      top: 10px;
+      height: calc(100vh - 20px);
+      min-height: calc(100vh - 20px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border-radius: 26px;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex: 0 0 auto;
+    }
+
+    .sidebar-top-compact {
+      margin-bottom: 8px;
+    }
+
+    .back-btn,
+    .sidebar-back,
+    .sidebar-sub {
+      display: none !important;
+    }
+
+    .sidebar-title {
+      margin: 0;
+      font-size: clamp(24px, 2vw, 30px);
+      line-height: 1.15;
+      letter-spacing: -.03em;
+    }
+
+    .unit-panel {
+      margin-top: 0;
+      padding: 16px;
+      border-radius: 22px;
+      height: 100%;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .unit-panel-head {
+      gap: 10px;
+      margin-bottom: 12px;
+      flex: 0 0 auto;
+    }
+
+    .unit-heading {
+      font-size: 16px;
+      letter-spacing: -.01em;
+    }
+
+    .stack-actions {
+      gap: 8px;
+      margin-top: 0;
+    }
+
+    .stack-actions .btn,
+    .stack-actions label.btn {
+      width: 100%;
+      min-height: 46px;
+      border-radius: 14px;
+      text-align: center;
+    }
+
+    .unit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: none;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scroll-padding: 12px;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: #3b6ea5 transparent;
+    }
+
+    .unit-list::-webkit-scrollbar,
+    .word-list::-webkit-scrollbar,
+    .lookup-dialog::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    .unit-list::-webkit-scrollbar-track,
+    .word-list::-webkit-scrollbar-track,
+    .lookup-dialog::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 999px;
+    }
+
+    .unit-list::-webkit-scrollbar-thumb,
+    .word-list::-webkit-scrollbar-thumb,
+    .lookup-dialog::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background: linear-gradient(180deg, rgba(59,110,165,.95), rgba(96,165,250,.95));
+      background-clip: padding-box;
+    }
+
+    .unit-list::-webkit-scrollbar-thumb:hover,
+    .word-list::-webkit-scrollbar-thumb:hover,
+    .lookup-dialog::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(96,165,250,.98), rgba(125,211,252,.98));
+      background-clip: padding-box;
+    }
+
+    .subject-card {
+      padding: 14px;
+      margin-bottom: 12px;
+      border-radius: 22px;
+    }
+
+    .subject-header {
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .subject-name {
+      font-size: 17px;
+    }
+
+    .lesson-row {
+      padding: 10px 12px;
+      border-radius: 16px;
+    }
+
+    .lesson-name {
+      font-size: 14px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+    }
+
+    .study-main {
+      min-width: 0;
+      width: 100%;
+      padding-bottom: 10px;
+    }
+
+    .study-header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 10px;
+      z-index: 20;
+      padding-top: 2px;
+    }
+
+    .mode-pill-wrap {
+      padding: 6px;
+      border-radius: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.20);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .toolbar {
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      border-radius: 24px;
+      position: sticky;
+      top: 76px;
+      z-index: 15;
+    }
+
+    .toolbar-row {
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .tabs {
+      gap: 8px;
+    }
+
+    .tabs button {
+      min-height: 40px;
+      padding: 8px 13px;
+      font-size: 13px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .toolbar-actions {
+      gap: 8px;
+      padding: 8px;
+      border-radius: 16px;
+      width: min(100%, 1000px);
+    }
+
+    .select {
+      height: 40px;
+      min-width: 116px;
+      border-radius: 12px;
+      padding: 0 12px;
+    }
+
+    .btn-outline {
+      padding: 10px 13px;
+      border-radius: 12px;
+    }
+
+    .progress-top-row {
+      margin-top: 14px;
+    }
+
+    .question-card,
+    .vocab-panel,
+    .mini-box {
+      border-radius: 22px;
+    }
+
+    .word-list {
+      max-height: min(56vh, 780px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #3b6ea5 transparent;
+    }
+
+    .lookup-trigger {
+      right: 18px;
+      bottom: 18px;
+      min-width: 56px;
+      height: 56px;
+      border-radius: 999px;
+    }
+
+    @media (min-width: 1440px) {
+      .app-shell {
+        grid-template-columns: clamp(450px, 29vw, 560px) minmax(0, 1fr);
+      }
+
+      .question-text {
+        max-width: 1100px;
+      }
+
+      .choice-grid {
+        max-width: 1080px;
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .app-shell {
+        width: min(100vw - 16px, 100%);
+        max-width: 100%;
+        padding: 8px;
+        gap: 14px;
+        grid-template-columns: 340px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        padding: 14px;
+      }
+
+      .toolbar {
+        top: 72px;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+      }
+
+      .unit-panel {
+        height: auto;
+      }
+
+      .unit-list {
+        max-height: 420px;
+      }
+
+      .study-header {
+        position: static;
+      }
+
+      .toolbar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-shell {
+        width: min(100vw - 10px, 100%);
+        padding: 5px;
+      }
+
+      .sidebar {
+        padding: 12px;
+        border-radius: 22px;
+      }
+
+      .sidebar-title {
+        font-size: 22px;
+      }
+
+      .unit-panel {
+        padding: 12px;
+        border-radius: 18px;
+      }
+
+      .toolbar {
+        padding: 14px;
+      }
+
+      .toolbar-actions .select,
+      .toolbar-actions .btn {
+        width: 100%;
+      }
+
+      .tabs button {
+        flex: 1 1 auto;
+      }
+    }
+
+
+    /* ===== professional study workspace refinement ===== */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: visible;
+    }
+
+    .workspace-top {
+      display: grid;
+      gap: 14px;
+    }
+
+    .workspace-kicker {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      color: #ccecff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .workspace-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-copy {
+      max-width: 720px;
+    }
+
+    .workspace-title {
+      margin: 0;
+      font-size: clamp(26px, 2.8vw, 38px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+      color: #fff;
+    }
+
+    .workspace-subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 72ch;
+    }
+
+    .toolbar-cta-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .toolbar-chip-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .status-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .status-chip-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(167,139,250,.18));
+      border: 1px solid rgba(255,255,255,.08);
+      flex: 0 0 auto;
+      font-size: 18px;
+    }
+
+    .status-chip-content {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .status-chip-content small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .status-chip-content strong {
+      min-width: 0;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toolbar-main-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .toolbar #modeTabs,
+    .toolbar #playTabs {
+      width: 100%;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--border) 90%, white 10%);
+      background: color-mix(in srgb, var(--panel) 90%, black 10%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .settings-panel {
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .settings-panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .settings-title {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .settings-note {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .setting-field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .setting-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .vocab-section {
+      margin-top: 4px;
+    }
+
+    .vocab-head-row {
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .vocab-title {
+      font-size: 24px;
+      letter-spacing: -.02em;
+    }
+
+    .vocab-head-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .vocab-panel {
+      padding: 20px;
+    }
+
+    .chips {
+      margin-bottom: 18px;
+    }
+
+    .chip {
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+
+    .word-item {
+      padding: 20px;
+      border-radius: 20px;
+    }
+
+    .word-vocab {
+      font-size: 24px;
+    }
+
+    .word-meaning {
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .word-actions .btn-ghost {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 14px;
+    }
+
+    .overview-card {
+      padding: 28px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: end;
+    }
+
+    .overview-copy {
+      max-width: 800px;
+    }
+
+    .overview-title {
+      margin-top: 6px;
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.08;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: #fff;
+    }
+
+    .overview-description {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+      max-width: 70ch;
+    }
+
+    .overview-actions {
+      display: grid;
+      gap: 10px;
+      min-width: min(100%, 220px);
+    }
+
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .overview-stat-card {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: color-mix(in srgb, var(--panel) 88%, black 12%);
+      display: grid;
+      gap: 8px;
+    }
+
+    .overview-stat-card small {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .overview-stat-card strong {
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 800;
+    }
+
+    @media (max-width: 1180px) {
+      .toolbar-chip-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .settings-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .workspace-title-row,
+      .overview-grid {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .toolbar-cta-group {
+        justify-content: flex-start;
+      }
+
+      .toolbar-chip-row,
+      .overview-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .workspace-title {
+        font-size: 24px;
+      }
+
+      .workspace-subtitle {
+        font-size: 14px;
+      }
+
+      .toolbar-cta-group {
+        width: 100%;
+      }
+
+      .toolbar-cta-group .btn {
+        flex: 1 1 calc(50% - 10px);
+      }
+
+      .vocab-title {
+        font-size: 20px;
+      }
+
+      .overview-card {
+        padding: 20px;
+      }
+    }
+
+  
+
+    /* ===== compact practice-first refinement ===== */
+    .workspace-top,
+    .workspace-kicker,
+    .toolbar-chip-row,
+    .workspace-subtitle,
+    .stats-strip {
+      display: none !important;
+    }
+
+    .toolbar {
+      padding: 14px 16px;
+      gap: 12px;
+    }
+
+    .toolbar-compact-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-compact-info {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .toolbar-mini-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: #fff;
+    }
+
+    .toolbar-mini-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .toolbar-main-grid {
+      gap: 10px;
+    }
+
+    .toolbar #modeTabs,
+    .toolbar #playTabs {
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .settings-note {
+      display: none;
+    }
+
+    .progress-top-row {
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+
+    .question-card {
+      min-height: calc(100vh - 245px);
+      padding: 26px 28px 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .question-card.overview-card {
+      min-height: auto;
+      display: block;
+    }
+
+    .question-card {
+      box-shadow: 0 22px 44px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+
+    .question-meta {
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .question-label {
+      display: none;
+    }
+
+    .question-text {
+      font-size: clamp(56px, 8vw, 108px);
+      line-height: 1.08;
+      margin-top: 0;
+      margin-bottom: 8px;
+      max-width: 100%;
+      padding-bottom: 0.12em;
+      overflow: visible;
+    }
+
+    .question-text.is-reverse {
+      font-size: clamp(40px, 5.8vw, 84px);
+      line-height: 1.12;
+      padding-bottom: 0.14em;
+    }
+
+    .question-text.is-typing {
+      font-size: clamp(46px, 6.4vw, 90px);
+      line-height: 1.12;
+      padding-bottom: 0.14em;
+    }
+
+    .question-head-actions {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+
+    .question-head-actions .btn,
+    .flashcard-actions .btn {
+      min-height: 48px;
+      padding: 0 18px;
+    }
+
+    .choice-grid {
+      max-width: none;
+      width: 100%;
+      margin-top: 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .choice {
+      min-height: 94px;
+      padding: 16px 20px;
+      font-size: 26px;
+      line-height: 1.3;
+      align-items: center;
+    }
+
+    .choice-badge {
+      width: 44px;
+      height: 44px;
+      font-size: 18px;
+    }
+
+    .input-row {
+      max-width: 100%;
+      margin-top: 24px;
+    }
+
+    .text-input {
+      min-height: 56px;
+      font-size: 18px;
+    }
+
+    .action-row {
+      margin-top: 24px;
+    }
+
+    @media (max-width: 1180px) {
+      .question-card {
+        min-height: calc(100vh - 220px);
+      }
+
+      .choice {
+        min-height: 84px;
+        font-size: 22px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .toolbar-compact-head,
+      .toolbar-cta-group {
+        width: 100%;
+      }
+
+      .toolbar-cta-group {
+        justify-content: flex-start;
+      }
+
+      .question-card {
+        min-height: auto;
+        padding: 22px 18px 24px;
+      }
+
+      .question-text {
+        font-size: clamp(42px, 12vw, 72px);
+        line-height: 1.1;
+        padding-bottom: 0.12em;
+      }
+
+      .question-text.is-reverse {
+        font-size: clamp(30px, 8.8vw, 54px);
+        line-height: 1.14;
+        padding-bottom: 0.14em;
+      }
+
+      .question-text.is-typing {
+        font-size: clamp(34px, 9.4vw, 60px);
+        line-height: 1.14;
+        padding-bottom: 0.14em;
+      }
+
+      .choice-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .choice {
+        min-height: 78px;
+        font-size: 20px;
+      }
+    }
+
+
+    .quick-add-panel {
+      margin-bottom: 14px;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 14px 26px rgba(0,0,0,.16);
+    }
+
+    .quick-add-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .quick-add-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -.02em;
+    }
+
+    .quick-add-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .quick-add-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .quick-field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .quick-field span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .quick-field .text-input {
+      width: 100%;
+      min-width: 0;
+      height: 50px;
+    }
+
+    .quick-add-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .quick-add-note {
+      margin-right: auto;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .action-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .action-modal.open {
+      display: flex;
+    }
+
+    .action-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(3, 9, 18, .72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .action-modal-panel {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 540px);
+      border-radius: 26px;
+      border: 1px solid color-mix(in srgb, var(--border) 82%, white 18%);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 96%, white 4%), color-mix(in srgb, var(--panel) 92%, black 8%));
+      box-shadow: 0 28px 60px rgba(0,0,0,.34);
+      padding: 22px;
+    }
+
+    .action-modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .action-modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: #d8ecff;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .action-modal-title {
+      margin: 12px 0 0;
+      font-size: 24px;
+      line-height: 1.12;
+      letter-spacing: -.03em;
+      color: #fff;
+    }
+
+    .action-modal-desc {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .action-modal-close {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--panel) 92%, black 8%);
+      color: var(--text);
+      font: inherit;
+      font-size: 18px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+
+    .action-modal-field {
+      margin-bottom: 16px;
+    }
+
+    .action-modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-modal-actions .btn {
+      min-width: 132px;
+      min-height: 48px;
+    }
+
+    .action-modal-confirm.is-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(239,68,68,.26);
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    .question-card.flashcard-mode {
+      justify-content: flex-start;
+      min-height: auto;
+      padding-bottom: 20px;
+    }
+
+    .question-text.question-text-meaning {
+      font-size: clamp(50px, 7vw, 96px);
+      max-width: 18ch;
+    }
+
+    .flashcard-wrap {
+      width: min(100%, 720px);
+      max-width: 720px;
+      align-self: center;
+      margin-top: 14px;
+    }
+
+    .flashcard {
+      width: 100%;
+      display: block;
+      height: clamp(210px, 24vw, 290px);
+      min-height: 210px;
+    }
+
+    .flashcard-face {
+      width: 100%;
+      padding: clamp(16px, 2.2vw, 22px);
+    }
+
+    .flashcard-main {
+      font-size: clamp(28px, 4.2vw, 48px);
+    }
+
+    .flashcard-nav {
+      max-width: 720px;
+      margin-top: 12px;
+    }
+
+    .flashcard-actions {
+      margin-top: 12px;
+    }
+
+    .flashcard-actions .btn {
+      min-width: 152px;
+    }
+
+    @media (max-width: 960px) {
+      .quick-add-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-add-actions {
+        justify-content: stretch;
+      }
+
+      .quick-add-actions .btn {
+        flex: 1 1 180px;
+      }
+
+      .action-modal-panel {
+        padding: 18px;
+      }
+
+      .action-modal-title {
+        font-size: 21px;
+      }
+    }
+
   </style>
 </head>
 <body data-theme="dark-blue" data-font="jakarta" data-display-font="noto-kr">
   <div class="app-shell">
     <aside class="sidebar card">
-      <div class="sidebar-top">
-        <button class="back-btn" title="Quay lại">←</button>
+      <div class="sidebar-top sidebar-top-compact">
         <div>
-          <div class="sidebar-back">Quay lại</div>
-          <h2 class="sidebar-title">Bộ từ vựng của bạn</h2>
-          <div class="sidebar-sub">Mỗi môn học là một folder. Bên trong folder có nhiều bài từ vựng riêng, có thể nhập bằng Excel hoặc tạo thủ công.</div>
+          <h2 class="sidebar-title">Bộ từ vựng</h2>
         </div>
       </div>
 
@@ -1294,14 +2516,34 @@
     <main class="study-main">
       <header class="study-header">
         <div class="mode-pill-wrap" id="sectionPills">
-          <button class="mode-pill" data-section="view">👁 Xem từ</button>
           <button class="mode-pill active" data-section="study">📖 Học</button>
+          <button class="mode-pill" data-section="vocab">📚 Từ vựng</button>
           <button class="mode-pill" data-section="play">🎮 Chơi</button>
         </div>
       </header>
 
       <section class="toolbar card">
-        <div class="toolbar-row">
+        <div class="toolbar-compact-head">
+          <div class="toolbar-compact-info">
+            <div class="toolbar-mini-title" id="workspaceTitle">Luyện tập</div>
+            <div class="toolbar-mini-meta">
+              <span id="statusSubjectName">-</span>
+              <span>•</span>
+              <span id="statusLessonName">-</span>
+              <span>•</span>
+              <span id="statusWordCount">0 từ</span>
+              <span id="statusModeName" class="hidden">Trắc nghiệm</span>
+            </div>
+          </div>
+          <div class="toolbar-cta-group">
+            <button class="btn btn-outline" id="shuffleBtn">↻ Trộn</button>
+            <button class="btn btn-outline" id="onlyWrongBtn">Ôn từ sai</button>
+            <button class="btn btn-outline" id="resetBtn">Làm mới</button>
+            <button class="btn btn-outline" id="settingsToggleBtn">⚙️ Tùy chỉnh</button>
+          </div>
+        </div>
+
+        <div class="toolbar-main-grid">
           <div class="tabs" id="modeTabs">
             <button data-mode="multiple-ko-vi" class="active">Trắc nghiệm</button>
             <button data-mode="multiple-vi-ko">Trắc nghiệm đảo</button>
@@ -1311,40 +2553,61 @@
           </div>
           <div class="tabs hidden" id="playTabs">
             <button data-play-mode="match-pairs" class="active">Ghép cặp từ</button>
+            <button data-play-mode="true-false">Đúng / Sai</button>
           </div>
+        </div>
 
-          <div class="toolbar-actions">
-            <select id="themeSelect" class="select">
-              <option value="dark-blue">Dark Blue</option>
-              <option value="violet-night">Violet Night</option>
-              <option value="forest-night">Forest Night</option>
-              <option value="slate-night">Slate Night</option>
-              <option value="aurora-glow">Aurora Glow</option>
-              <option value="sunset-coral">Sunset Coral</option>
-              <option value="rose-night">Rose Night</option>
-            </select>
-            <select id="fontSelect" class="select">
-              <option value="jakarta">Plus Jakarta Sans</option>
-              <option value="vietnam">Be Vietnam Pro</option>
-              <option value="lexend">Lexend</option>
-            </select>
-            <select id="displayFontSelect" class="select">
-              <option value="noto-kr">Noto Sans KR</option>
-              <option value="jakarta-display">Jakarta Display</option>
-              <option value="vietnam-display">Be Vietnam Display</option>
-            </select>
-            <select id="listeningRate" class="select">
-              <option value="0.7">0.7x</option>
-              <option value="0.85">0.85x</option>
-              <option value="0.9" selected>0.9x</option>
-              <option value="1">1.0x</option>
-            </select>
-            <select id="voiceSelect" class="select" title="Giọng đọc tiếng Hàn">
-              <option value="auto">Giọng Hàn: Tự động</option>
-            </select>
-            <button class="btn btn-outline" id="shuffleBtn">↻ Trộn</button>
-            <button class="btn btn-outline" id="onlyWrongBtn">Ôn từ sai</button>
-            <button class="btn btn-outline" id="resetBtn">Làm mới</button>
+        <div class="settings-panel hidden" id="settingsPanel">
+          <div class="settings-panel-head">
+            <div>
+              <div class="settings-title">Giao diện &amp; âm thanh</div>
+              <div class="settings-note">Các thiết lập phụ được gom riêng để khu học tập gọn và chuyên nghiệp hơn.</div>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <label class="setting-field">
+              <span class="setting-label">Chủ đề màu</span>
+              <select id="themeSelect" class="select">
+                <option value="dark-blue">Dark Blue</option>
+                <option value="violet-night">Violet Night</option>
+                <option value="forest-night">Forest Night</option>
+                <option value="slate-night">Slate Night</option>
+                <option value="aurora-glow">Aurora Glow</option>
+                <option value="sunset-coral">Sunset Coral</option>
+                <option value="rose-night">Rose Night</option>
+              </select>
+            </label>
+            <label class="setting-field">
+              <span class="setting-label">Font giao diện</span>
+              <select id="fontSelect" class="select">
+                <option value="jakarta">Plus Jakarta Sans</option>
+                <option value="vietnam">Be Vietnam Pro</option>
+                <option value="lexend">Lexend</option>
+              </select>
+            </label>
+            <label class="setting-field">
+              <span class="setting-label">Font tiếng Hàn</span>
+              <select id="displayFontSelect" class="select">
+                <option value="noto-kr">Noto Sans KR</option>
+                <option value="jakarta-display">Jakarta Display</option>
+                <option value="vietnam-display">Be Vietnam Display</option>
+              </select>
+            </label>
+            <label class="setting-field">
+              <span class="setting-label">Tốc độ đọc</span>
+              <select id="listeningRate" class="select">
+                <option value="0.7">0.7x</option>
+                <option value="0.85">0.85x</option>
+                <option value="0.9" selected>0.9x</option>
+                <option value="1">1.0x</option>
+              </select>
+            </label>
+            <label class="setting-field">
+              <span class="setting-label">Giọng đọc</span>
+              <select id="voiceSelect" class="select" title="Giọng đọc tiếng Hàn">
+                <option value="auto">Giọng Hàn: Tự động</option>
+              </select>
+            </label>
           </div>
         </div>
 
@@ -1368,11 +2631,36 @@
 
       <section class="vocab-section">
         <div class="vocab-head-row">
-          <h3 class="vocab-title">Từ vựng trong bài hiện tại</h3>
+          <h3 class="vocab-title" id="vocabSectionTitle">Từ vựng của bài hiện tại</h3>
           <div class="vocab-head-actions">
             <span class="muted-inline">⭐ <span id="chipFavCountInline">0</span></span>
             <button class="btn btn-outline" id="addWordBtn">＋ Thêm từ vào bài</button>
             <button class="btn btn-ghost" id="toggleFavoritesFilterBtn">Từ yêu thích</button>
+          </div>
+        </div>
+
+        <div class="quick-add-panel hidden" id="quickAddPanel">
+          <div class="quick-add-head">
+            <div>
+              <div class="quick-add-title">Thêm từ mới một cách gọn gàng</div>
+              <div class="quick-add-sub" id="quickAddLessonLabel">Bài hiện tại</div>
+            </div>
+            <button class="action-modal-close" id="closeQuickAddBtn" type="button" aria-label="Đóng">✕</button>
+          </div>
+          <div class="quick-add-grid">
+            <label class="quick-field">
+              <span>Từ tiếng Hàn</span>
+              <input id="quickAddVocab" class="text-input" type="text" placeholder="Ví dụ: 맛있다" />
+            </label>
+            <label class="quick-field">
+              <span>Nghĩa tiếng Việt</span>
+              <input id="quickAddMeaning" class="text-input" type="text" placeholder="Ví dụ: ngon" />
+            </label>
+          </div>
+          <div class="quick-add-actions">
+            <div class="quick-add-note">Enter để lưu nhanh khi đang ở ô nghĩa.</div>
+            <button class="btn btn-outline" id="cancelQuickAddBtn" type="button">Hủy</button>
+            <button class="btn btn-primary" id="saveQuickAddBtn" type="button">Lưu từ mới</button>
           </div>
         </div>
 
@@ -1392,6 +2680,31 @@
         </div>
       </section>
     </main>
+  </div>
+
+
+  <div class="action-modal" id="actionModal" aria-hidden="true">
+    <div class="action-modal-backdrop" id="actionModalBackdrop"></div>
+    <div class="action-modal-panel">
+      <div class="action-modal-top">
+        <div>
+          <div class="action-modal-badge" id="actionModalBadge">Tác vụ</div>
+          <h3 class="action-modal-title" id="actionModalTitle">Tiêu đề</h3>
+          <p class="action-modal-desc" id="actionModalDesc">Mô tả</p>
+        </div>
+        <button class="action-modal-close" id="actionModalClose" type="button" aria-label="Đóng">✕</button>
+      </div>
+      <div class="action-modal-field hidden" id="actionModalFieldWrap">
+        <label class="quick-field">
+          <span id="actionModalFieldLabel">Tên</span>
+          <input id="actionModalInput" class="text-input" type="text" />
+        </label>
+      </div>
+      <div class="action-modal-actions">
+        <button class="btn btn-outline" id="actionModalCancelBtn" type="button">Hủy</button>
+        <button class="btn btn-primary action-modal-confirm" id="actionModalConfirmBtn" type="button">Xác nhận</button>
+      </div>
+    </div>
   </div>
 
   <button class="lookup-trigger" id="openLookupBtn" type="button">Tra Việt</button>
@@ -1485,6 +2798,12 @@
       matchMoves: 0,
       matchMatchedCount: 0,
       matchBusy: false,
+      judgeRound: 0,
+      judgeTotal: 10,
+      judgeScore: 0,
+      judgeAnswered: false,
+      judgeCurrent: null,
+      judgeLastCorrect: null,
       speechRecognition: null,
       speechSupported: false,
       speechListening: false,
@@ -1494,6 +2813,9 @@
       lookupModalOpen: false,
       lookupOnlineCache: {},
       inlineEdit: null,
+      settingsOpen: false,
+      wordFormOpen: false,
+      dialog: { open: false, type: "confirm", action: "", payload: null },
       micSupportedChecked: false,
     };
 
@@ -2015,7 +3337,8 @@
         if (Number.isInteger(saved.activeSubjectIndex) && saved.activeSubjectIndex >= 0 && saved.activeSubjectIndex < state.subjects.length) {
           state.activeSubjectIndex = saved.activeSubjectIndex;
         }
-        if (saved.appSection) state.appSection = saved.appSection;
+        if (saved.appSection === "view") state.appSection = "vocab";
+        else if (saved.appSection) state.appSection = saved.appSection;
         if (saved.playMode) state.playMode = saved.playMode;
         const lessons = getActiveSubject()?.lessons || [];
         if (Number.isInteger(saved.activeLessonIndex) && saved.activeLessonIndex >= 0 && saved.activeLessonIndex < lessons.length) {
@@ -2112,8 +3435,7 @@
       const preferred = getPreferredKoreanVoice();
       if (preferred) utter.voice = preferred;
       state.koreanVoice = preferred;
-      playSpeakCue();
-      setTimeout(() => window.speechSynthesis.speak(utter), 45);
+      window.speechSynthesis.speak(utter);
     }
 
     function ensureAudioContext() {
@@ -2128,18 +3450,29 @@
       const ctx = ensureAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
-      const oscillator = ctx.createOscillator();
-      const gain = ctx.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(isCorrect ? 880 : 320, now);
-      oscillator.frequency.exponentialRampToValueAtTime(isCorrect ? 1175 : 220, now + (isCorrect ? 0.16 : 0.22));
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + (isCorrect ? 0.2 : 0.24));
-      oscillator.connect(gain);
-      gain.connect(ctx.destination);
-      oscillator.start(now);
-      oscillator.stop(now + (isCorrect ? 0.22 : 0.26));
+
+      const playNote = (freq, start, duration, type = "sine", gainPeak = 0.05) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, start);
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.linearRampToValueAtTime(gainPeak, start + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + duration + 0.02);
+      };
+
+      if (isCorrect) {
+        playNote(784, now, 0.12, "triangle", 0.045);
+        playNote(988, now + 0.085, 0.14, "sine", 0.05);
+        playNote(1319, now + 0.17, 0.18, "sine", 0.055);
+      } else {
+        playNote(330, now, 0.16, "sawtooth", 0.035);
+        playNote(247, now + 0.1, 0.2, "sine", 0.03);
+      }
     }
 
     function showError(message) {
@@ -2154,12 +3487,26 @@
       box.classList.remove("show");
     }
 
-    function createSubject() {
-      const name = prompt("Nhập tên môn học/folder mới:", "Môn học mới");
-      if (!name || !name.trim()) return;
+    function createSubject(name) {
+      if (typeof name !== "string") {
+        openActionModal({
+          type: "input",
+          action: "create-subject",
+          badge: "Môn học",
+          title: "Tạo môn học mới",
+          description: "Đặt tên rõ ràng để quản lý bài học chuyên nghiệp hơn.",
+          label: "Tên môn học",
+          placeholder: "Ví dụ: KOREAN",
+          value: "Môn học mới",
+          confirmLabel: "Tạo môn học",
+        });
+        return;
+      }
+      const cleaned = name.trim();
+      if (!cleaned) return;
       state.subjects.push({
         id: makeId("subject"),
-        name: name.trim(),
+        name: cleaned,
         sourceFile: "Tạo thủ công",
         lessons: [],
       });
@@ -2169,17 +3516,31 @@
       resetQuiz();
     }
 
-    function createLesson() {
+    function createLesson(name) {
       const subject = getActiveSubject();
       if (!subject) {
         showError("Hãy tạo môn học trước rồi mới thêm bài.");
         return;
       }
-      const name = prompt(`Nhập tên bài từ vựng trong môn học "${subject.name}":`, `Bài ${subject.lessons.length + 1}`);
-      if (!name || !name.trim()) return;
+      if (typeof name !== "string") {
+        openActionModal({
+          type: "input",
+          action: "create-lesson",
+          badge: "Bài học",
+          title: "Tạo bài từ vựng mới",
+          description: `Bài này sẽ được thêm vào môn học "${subject.name}".`,
+          label: "Tên bài",
+          placeholder: "Ví dụ: Bài 1",
+          value: `Bài ${subject.lessons.length + 1}`,
+          confirmLabel: "Tạo bài",
+        });
+        return;
+      }
+      const cleaned = name.trim();
+      if (!cleaned) return;
       subject.lessons.push({
         id: makeId("lesson"),
-        name: name.trim(),
+        name: cleaned,
         sourceFile: "Tạo thủ công",
         words: [],
       });
@@ -2237,10 +3598,22 @@
       startInlineEdit('subject', { subjectIndex: index });
     }
 
-    function deleteSubject(index) {
+    function deleteSubject(index, skipConfirm = false) {
       const subject = state.subjects[index];
       if (!subject) return;
-      if (!confirm(`Bạn chắc chắn muốn xóa folder "${subject.name}" và toàn bộ bài bên trong?`)) return;
+      if (!skipConfirm) {
+        openActionModal({
+          type: "confirm",
+          action: "delete-subject",
+          payload: { index },
+          badge: "Xóa môn học",
+          title: `Xóa "${subject.name}"?`,
+          description: "Toàn bộ bài và từ vựng bên trong sẽ bị xóa khỏi bộ dữ liệu hiện tại.",
+          confirmLabel: "Xóa môn học",
+          danger: true,
+        });
+        return;
+      }
       state.subjects.splice(index, 1);
       if (!state.subjects.length) state.subjects = JSON.parse(JSON.stringify(defaultSubjects));
       state.activeSubjectIndex = Math.min(state.activeSubjectIndex, state.subjects.length - 1);
@@ -2253,11 +3626,23 @@
       startInlineEdit('lesson', { subjectIndex, lessonIndex });
     }
 
-    function deleteLesson(subjectIndex, lessonIndex) {
+    function deleteLesson(subjectIndex, lessonIndex, skipConfirm = false) {
       const subject = state.subjects[subjectIndex];
       const lesson = subject?.lessons?.[lessonIndex];
       if (!subject || !lesson) return;
-      if (!confirm(`Bạn chắc chắn muốn xóa bài "${lesson.name}"?`)) return;
+      if (!skipConfirm) {
+        openActionModal({
+          type: "confirm",
+          action: "delete-lesson",
+          payload: { subjectIndex, lessonIndex },
+          badge: "Xóa bài học",
+          title: `Xóa bài "${lesson.name}"?`,
+          description: "Thao tác này sẽ xóa toàn bộ từ vựng thuộc bài hiện tại.",
+          confirmLabel: "Xóa bài",
+          danger: true,
+        });
+        return;
+      }
       subject.lessons.splice(lessonIndex, 1);
       if (!subject.lessons.length) {
         subject.lessons.push({ id: makeId("lesson"), name: "Bài 1", sourceFile: "Tạo thủ công", words: [] });
@@ -2380,19 +3765,33 @@
       renderStats();
     }
 
-    function addWord() {
+    function addWord(vocab, meaning) {
       const lesson = getActiveLesson();
       if (!lesson) {
         showError("Hãy tạo hoặc chọn một bài trước khi thêm từ.");
         return;
       }
-      const vocab = prompt(`Thêm từ tiếng Hàn cho bài "${lesson.name}":`);
-      if (!vocab || !vocab.trim()) return;
-      const meaning = prompt(`Nhập nghĩa tiếng Việt cho từ "${vocab.trim()}":`);
-      if (!meaning || !meaning.trim()) return;
-      lesson.words.push(createWord(vocab.trim(), meaning.trim()));
+      if (typeof vocab !== "string" || typeof meaning !== "string") {
+        openQuickAddPanel();
+        return;
+      }
+      const cleanedVocab = vocab.trim();
+      const cleanedMeaning = meaning.trim();
+      if (!cleanedVocab || !cleanedMeaning) {
+        showError("Vui lòng nhập đủ từ tiếng Hàn và nghĩa tiếng Việt.");
+        return;
+      }
+      lesson.words.unshift(createWord(cleanedVocab, cleanedMeaning));
       saveState();
+      state.wordFormOpen = true;
       resetQuiz();
+      const vocabInput = document.getElementById("quickAddVocab");
+      const meaningInput = document.getElementById("quickAddMeaning");
+      if (vocabInput) vocabInput.value = "";
+      if (meaningInput) meaningInput.value = "";
+      requestAnimationFrame(() => {
+        document.getElementById("quickAddVocab")?.focus();
+      });
     }
 
     function editWord(wordId) {
@@ -2401,12 +3800,24 @@
       startInlineEdit('word', { wordId, originalVocab: word.vocab });
     }
 
-    function deleteWord(wordId) {
+    function deleteWord(wordId, skipConfirm = false) {
       const lesson = getActiveLesson();
       if (!lesson) return;
       const index = lesson.words.findIndex(w => w.id === wordId);
       if (index < 0) return;
-      if (!confirm(`Xóa từ "${lesson.words[index].vocab}"?`)) return;
+      if (!skipConfirm) {
+        openActionModal({
+          type: "confirm",
+          action: "delete-word",
+          payload: { wordId },
+          badge: "Xóa từ vựng",
+          title: `Xóa từ "${lesson.words[index].vocab}"?`,
+          description: "Bạn vẫn có thể thêm lại từ này sau nếu cần.",
+          confirmLabel: "Xóa từ",
+          danger: true,
+        });
+        return;
+      }
       lesson.words.splice(index, 1);
       saveState();
       resetQuiz();
@@ -2606,11 +4017,89 @@
       state.matchBusy = false;
     }
 
+    function initJudgeGame() {
+      state.judgeRound = 0;
+      state.judgeScore = 0;
+      state.judgeAnswered = false;
+      state.judgeCurrent = null;
+      state.judgeLastCorrect = null;
+      nextJudgeRound();
+    }
+
+    function buildJudgeRound() {
+      const words = getWords();
+      if (!words.length) return null;
+      const current = shuffleArray([...words])[0];
+      const canUseWrong = words.length > 1;
+      const shouldBeCorrect = !canUseWrong ? true : Math.random() < 0.5;
+      let shownMeaning = current.meaning;
+      if (!shouldBeCorrect) {
+        shownMeaning = uniqueMeanings(words, current.meaning, 1)[0] || current.meaning;
+      }
+      return {
+        vocab: current.vocab,
+        correctMeaning: current.meaning,
+        shownMeaning,
+        isCorrect: normalizeText(shownMeaning) === normalizeText(current.meaning),
+      };
+    }
+
+    function nextJudgeRound() {
+      if (state.judgeRound >= state.judgeTotal) return;
+      state.judgeCurrent = buildJudgeRound();
+      state.judgeAnswered = false;
+      state.judgeLastCorrect = null;
+    }
+
+    function handleJudgeAnswer(userThinksCorrect) {
+      if (!state.judgeCurrent || state.judgeAnswered) return;
+      state.judgeAnswered = true;
+      const isRight = Boolean(userThinksCorrect) === Boolean(state.judgeCurrent.isCorrect);
+      state.judgeLastCorrect = isRight;
+      if (isRight) {
+        state.judgeScore += 1;
+        playFeedbackSound(true);
+      } else {
+        playFeedbackSound(false);
+      }
+      renderQuestion();
+    }
+
+    function advanceJudgeRound() {
+      if (state.judgeRound < state.judgeTotal) state.judgeRound += 1;
+      if (state.judgeRound >= state.judgeTotal) {
+        state.judgeAnswered = true;
+        renderQuestion();
+        return;
+      }
+      nextJudgeRound();
+      renderQuestion();
+    }
+
+    function resetCurrentPlayMode() {
+      if (state.playMode === "true-false") initJudgeGame();
+      else initMatchGame();
+    }
+
     function selectSection(section) {
       state.appSection = section;
-      if (section === "play" && !state.matchPairs.length) initMatchGame();
+      if (section === "play") {
+        if (state.playMode === "true-false" && !state.judgeCurrent) initJudgeGame();
+        if (state.playMode === "match-pairs" && !state.matchPairs.length) initMatchGame();
+        state.settingsOpen = false;
+      }
       saveState();
       render();
+    }
+
+    function openCurrentLessonVocab() {
+      state.appSection = "vocab";
+      state.settingsOpen = false;
+      saveState();
+      render();
+      requestAnimationFrame(() => {
+        document.querySelector('.vocab-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     }
 
     function handleMatchCard(cardId) {
@@ -2650,16 +4139,73 @@
       renderQuestion();
     }
 
+    function getModeLabel() {
+      const studyLabels = {
+        "multiple-ko-vi": "Trắc nghiệm",
+        "multiple-vi-ko": "Trắc nghiệm đảo",
+        typing: "Gõ từ",
+        listening: "Phát âm",
+        flashcard: "Flash card",
+      };
+      if (state.appSection === "play") {
+        if (state.playMode === "match-pairs") return "Ghép cặp từ";
+        if (state.playMode === "true-false") return "Đúng / Sai";
+        return "Trò chơi";
+      }
+      if (state.appSection === "vocab") return "Quản lý từ vựng";
+      return studyLabels[state.mode] || "Học từ vựng";
+    }
+
+    function updateWorkspaceMeta() {
+      const subject = getActiveSubject();
+      const lesson = getActiveLesson();
+      const wordCount = getWords().length;
+      const titleEl = document.getElementById("workspaceTitle");
+      const subtitleEl = document.getElementById("workspaceSubtitle");
+      const sectionCopy = {
+        study: {
+          title: "Luyện tập",
+          subtitle: "",
+        },
+        vocab: {
+          title: "Từ vựng",
+          subtitle: "",
+        },
+        play: {
+          title: "Trò chơi",
+          subtitle: "",
+        },
+      };
+      const copy = sectionCopy[state.appSection] || sectionCopy.study;
+      if (titleEl) titleEl.textContent = copy.title;
+      if (subtitleEl) subtitleEl.textContent = copy.subtitle;
+      const subjectEl = document.getElementById("statusSubjectName");
+      const lessonEl = document.getElementById("statusLessonName");
+      const wordCountEl = document.getElementById("statusWordCount");
+      const modeEl = document.getElementById("statusModeName");
+      if (subjectEl) subjectEl.textContent = subject?.name || "Chưa có môn";
+      if (lessonEl) lessonEl.textContent = lesson?.name || "Chưa có bài";
+      if (wordCountEl) wordCountEl.textContent = `${wordCount} từ`;
+      if (modeEl) modeEl.textContent = getModeLabel();
+      const toggleBtn = document.getElementById("settingsToggleBtn");
+      if (toggleBtn) toggleBtn.textContent = state.settingsOpen ? "✕ Đóng tuỳ chỉnh" : "⚙️ Tùy chỉnh";
+    }
+
+    function toggleSettingsPanel(forceValue) {
+      state.settingsOpen = typeof forceValue === "boolean" ? forceValue : !state.settingsOpen;
+      renderPanels();
+    }
+
     function renderQuestion() {
       const current = getCurrent();
       const lesson = getActiveLesson();
       const area = document.getElementById("questionArea");
       if (!lesson) {
-        area.innerHTML = `<div class="card question-card"><div style="text-align:center;color:var(--muted);">Chưa có bài nào để học. Hãy tạo bài hoặc nhập Excel vào môn học.</div></div>`;
+        area.innerHTML = `<div class="card question-card${state.mode === "flashcard" ? " flashcard-mode" : ""}"><div style="text-align:center;color:var(--muted);">Chưa có bài nào để học. Hãy tạo bài hoặc nhập Excel vào môn học.</div></div>`;
         return;
       }
-      if (state.appSection === "view") {
-        area.innerHTML = `<div class="card question-card"></div>`;
+      if (state.appSection === "vocab") {
+        area.innerHTML = ``;
         return;
       }
       if (state.appSection === "play") {
@@ -2667,9 +4213,16 @@
           area.innerHTML = `<div class="card question-card"><div style="text-align:center;color:var(--muted);">Bài này chưa có đủ từ để chơi.</div></div>`;
           return;
         }
+        if (state.playMode === "true-false") {
+          if (!state.judgeCurrent) initJudgeGame();
+          const isFinished = state.judgeRound >= state.judgeTotal;
+          const currentJudge = state.judgeCurrent;
+          area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="judge-wrap"><div class="judge-top"><div>Điểm: ${state.judgeScore}/${state.judgeTotal}</div><div>Câu: ${Math.min(state.judgeRound + 1, state.judgeTotal)} / ${state.judgeTotal}</div></div>${isFinished ? `<div class="feedback correct"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div>Bạn đúng <b>${state.judgeScore}/${state.judgeTotal}</b> câu.</div></div><div class="action-row"><button class="btn btn-outline" onclick="initJudgeGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div>` : `<div class="judge-card"><div class="judge-korean">${escapeHtml(currentJudge?.vocab || "")}</div><div class="judge-divider">có nghĩa là</div><div class="judge-meaning">${escapeHtml(currentJudge?.shownMeaning || "")}</div></div><div class="judge-actions">${state.judgeAnswered ? `<button class="btn judge-btn ${currentJudge?.isCorrect ? "true" : "false"}" disabled>${currentJudge?.isCorrect ? "✅ Mệnh đề đúng" : "❌ Mệnh đề sai"}</button><button class="btn btn-primary judge-btn" onclick="advanceJudgeRound()">Câu tiếp theo →</button>` : `<button class="btn judge-btn true" onclick="handleJudgeAnswer(true)">⭕ Đúng</button><button class="btn judge-btn false" onclick="handleJudgeAnswer(false)">✖ Sai</button>`}</div>${state.judgeAnswered ? `<div class="feedback ${state.judgeLastCorrect ? "correct" : "wrong"}" style="margin-top:0;"><div style="font-weight:800; margin-bottom:8px;">${state.judgeLastCorrect ? "✅ Chính xác" : "❌ Chưa đúng"}</div><div style="font-size:14px; line-height:1.7; color:#e5eefc;">Đáp án đúng: <b>${escapeHtml(currentJudge?.vocab || "")}</b> = <b>${escapeHtml(currentJudge?.correctMeaning || "")}</b>.</div></div>` : ``}`}</div></div>`;
+          return;
+        }
         if (!state.matchPairs.length) initMatchGame();
         const done = state.matchMatchedCount >= Math.min(6, getWords().length);
-        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div></div>` : ``}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button></div></div></div>`;
+        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div></div>` : ``}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div></div></div>`;
         return;
       }
       if (!current) {
@@ -2689,19 +4242,18 @@
       else if (state.mode === "multiple-vi-ko") label = "Chọn từ tiếng Hàn đúng cho nghĩa tiếng Việt";
       else if (state.mode === "typing") label = "Nhập từ tiếng Hàn tương ứng với nghĩa";
       else if (state.mode === "flashcard") label = "Flash card từ vựng";
-      else label = "Nghe phát âm rồi gõ hoặc bấm micro để nói lại từ tiếng Hàn";
+      else label = "Nghe và nhập từ";
 
       const compactHeader = state.mode === "flashcard";
       let html = `
-        <div class="card question-card">
+        <div class="card question-card${state.mode === "flashcard" ? " flashcard-mode" : ""}">
           ${compactHeader ? `` : `<div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div>
           <div class="question-label">${label}</div>
-          <div class="question-text ${questionToneClass()}">${escapeHtml(title)}</div>`}
+          <div class="question-text ${questionToneClass()} ${state.mode === "multiple-vi-ko" ? "is-reverse" : ""} ${state.mode === "typing" ? "is-typing" : ""}">${escapeHtml(title)}</div>`}
 
           <div class="question-head-actions">
-            <button class="btn btn-outline" onclick='toggleFavorite(${JSON.stringify(current.vocab)})'>⭐ ${state.favorites.includes(current.vocab) ? "Đã lưu" : "Yêu thích"}</button>
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe lại</button>
-            <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, 0.72)'>🐢 Đọc chậm</button>
+            <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
           </div>
       `;
 
@@ -2742,8 +4294,8 @@
           </div>
           <div class="flashcard-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe từ</button>
-            <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, 0.72)'>🐢 Đọc chậm</button>
             <button class="btn btn-primary" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
+            <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
           </div>
         `;
       } else {
@@ -2827,6 +4379,130 @@
       }).join("");
     }
 
+
+    function openQuickAddPanel() {
+      const lesson = getActiveLesson();
+      if (!lesson) {
+        showError("Hãy tạo hoặc chọn một bài trước khi thêm từ.");
+        return;
+      }
+      state.wordFormOpen = true;
+      renderPanels();
+      requestAnimationFrame(() => {
+        document.getElementById("quickAddVocab")?.focus();
+      });
+    }
+
+    function closeQuickAddPanel(clearFields = false) {
+      state.wordFormOpen = false;
+      if (clearFields) {
+        const vocabInput = document.getElementById("quickAddVocab");
+        const meaningInput = document.getElementById("quickAddMeaning");
+        if (vocabInput) vocabInput.value = "";
+        if (meaningInput) meaningInput.value = "";
+      }
+      renderPanels();
+    }
+
+    function saveQuickAddWord() {
+      const vocab = document.getElementById("quickAddVocab")?.value || "";
+      const meaning = document.getElementById("quickAddMeaning")?.value || "";
+      addWord(vocab, meaning);
+    }
+
+    function openActionModal(config = {}) {
+      state.dialog = {
+        open: true,
+        type: config.type || "confirm",
+        action: config.action || "",
+        payload: config.payload || null,
+        badge: config.badge || "Tác vụ",
+        title: config.title || "",
+        description: config.description || "",
+        label: config.label || "Tên",
+        placeholder: config.placeholder || "",
+        value: config.value || "",
+        confirmLabel: config.confirmLabel || "Xác nhận",
+        cancelLabel: config.cancelLabel || "Hủy",
+        danger: !!config.danger,
+      };
+      renderActionModal();
+      requestAnimationFrame(() => {
+        const input = document.getElementById("actionModalInput");
+        if (state.dialog.type === "input" && input) {
+          input.focus();
+          input.select();
+        }
+      });
+    }
+
+    function closeActionModal() {
+      state.dialog = { open: false, type: "confirm", action: "", payload: null };
+      renderActionModal();
+    }
+
+    function renderActionModal() {
+      const modal = document.getElementById("actionModal");
+      if (!modal) return;
+      const dialog = state.dialog || {};
+      const isOpen = !!dialog.open;
+      modal.classList.toggle("open", isOpen);
+      modal.setAttribute("aria-hidden", isOpen ? "false" : "true");
+      document.body.classList.toggle("modal-open", isOpen);
+
+      document.getElementById("actionModalBadge").textContent = dialog.badge || "Tác vụ";
+      document.getElementById("actionModalTitle").textContent = dialog.title || "";
+      document.getElementById("actionModalDesc").textContent = dialog.description || "";
+
+      const fieldWrap = document.getElementById("actionModalFieldWrap");
+      const input = document.getElementById("actionModalInput");
+      const label = document.getElementById("actionModalFieldLabel");
+      const confirmBtn = document.getElementById("actionModalConfirmBtn");
+      const cancelBtn = document.getElementById("actionModalCancelBtn");
+
+      fieldWrap.classList.toggle("hidden", dialog.type !== "input");
+      label.textContent = dialog.label || "Tên";
+      input.placeholder = dialog.placeholder || "";
+      input.value = dialog.value || "";
+      confirmBtn.textContent = dialog.confirmLabel || "Xác nhận";
+      cancelBtn.textContent = dialog.cancelLabel || "Hủy";
+      confirmBtn.classList.toggle("is-danger", !!dialog.danger);
+    }
+
+    function submitActionModal() {
+      const dialog = state.dialog || {};
+      if (!dialog.open) return;
+      let value = "";
+      if (dialog.type === "input") {
+        const input = document.getElementById("actionModalInput");
+        value = (input?.value || "").trim();
+        if (!value) {
+          input?.focus();
+          return;
+        }
+      }
+      closeActionModal();
+      switch (dialog.action) {
+        case "create-subject":
+          createSubject(value);
+          break;
+        case "create-lesson":
+          createLesson(value);
+          break;
+        case "delete-subject":
+          deleteSubject(dialog.payload?.index, true);
+          break;
+        case "delete-lesson":
+          deleteLesson(dialog.payload?.subjectIndex, dialog.payload?.lessonIndex, true);
+          break;
+        case "delete-word":
+          deleteWord(dialog.payload?.wordId, true);
+          break;
+        default:
+          break;
+      }
+    }
+
     function renderPanels() {
       document.body.setAttribute("data-theme", state.themeName);
       document.body.setAttribute("data-font", state.fontName);
@@ -2840,19 +4516,50 @@
       document.querySelectorAll("#playTabs button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.playMode === state.playMode);
       });
+
       const isStudy = state.appSection === "study";
       const isPlay = state.appSection === "play";
+      const isVocab = state.appSection === "vocab";
+      const activeSubject = getActiveSubject();
+      const activeLesson = getActiveLesson();
+
       document.getElementById("modeTabs").classList.toggle("hidden", !isStudy);
       document.getElementById("playTabs").classList.toggle("hidden", !isPlay);
-      document.querySelector('.stats-strip').classList.toggle('section-hidden', state.appSection !== 'study');
-      document.querySelector('.vocab-section').classList.toggle('section-hidden', false);
+      document.querySelector(".stats-strip").classList.toggle("section-hidden", !isStudy);
+      document.querySelector(".vocab-section").classList.toggle("section-hidden", !isVocab);
+      document.getElementById("settingsPanel").classList.toggle("hidden", !state.settingsOpen);
+
       document.getElementById("themeSelect").value = state.themeName;
       document.getElementById("fontSelect").value = state.fontName;
       document.getElementById("displayFontSelect").value = state.displayFontName;
       document.getElementById("listeningRate").value = state.listeningRate;
       populateVoiceSelect();
+
       document.getElementById("toggleFavoritesFilterBtn").textContent = state.onlyFavorites ? "Tất cả từ" : "Từ yêu thích";
       document.getElementById("onlyWrongBtn").textContent = state.onlyWrongPool ? "Đang ôn từ sai" : "Ôn từ sai";
+
+      const vocabTitleEl = document.getElementById("vocabSectionTitle");
+      if (vocabTitleEl) {
+        vocabTitleEl.textContent = activeLesson ? `Từ vựng • ${activeLesson.name}` : "Từ vựng của bài hiện tại";
+      }
+
+      const quickAddPanel = document.getElementById("quickAddPanel");
+      const quickAddLessonLabel = document.getElementById("quickAddLessonLabel");
+      const addWordBtn = document.getElementById("addWordBtn");
+      if (quickAddPanel) {
+        quickAddPanel.classList.toggle("hidden", !(isVocab && state.wordFormOpen));
+      }
+      if (quickAddLessonLabel) {
+        quickAddLessonLabel.textContent = activeLesson
+          ? `${activeSubject?.name || "Môn học"} • ${activeLesson.name}`
+          : "Hãy chọn bài để thêm từ";
+      }
+      if (addWordBtn) {
+        addWordBtn.textContent = state.wordFormOpen ? "✕ Đóng thêm từ" : "＋ Thêm từ vào bài";
+      }
+
+      updateWorkspaceMeta();
+      renderActionModal();
       renderTopicList();
     }
 
@@ -2870,10 +4577,36 @@
       e.target.value = "";
     });
 
-    document.getElementById("createSubjectBtn").addEventListener("click", createSubject);
-    document.getElementById("createLessonBtn").addEventListener("click", createLesson);
-    document.getElementById("addWordBtn").addEventListener("click", addWord);
+    document.getElementById("createSubjectBtn").addEventListener("click", () => createSubject());
+    document.getElementById("createLessonBtn").addEventListener("click", () => createLesson());
+    document.getElementById("addWordBtn").addEventListener("click", () => state.wordFormOpen ? closeQuickAddPanel(false) : openQuickAddPanel());
+    document.getElementById("closeQuickAddBtn").addEventListener("click", () => closeQuickAddPanel(false));
+    document.getElementById("cancelQuickAddBtn").addEventListener("click", () => closeQuickAddPanel(false));
+    document.getElementById("saveQuickAddBtn").addEventListener("click", saveQuickAddWord);
+    document.getElementById("quickAddVocab").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("quickAddMeaning")?.focus();
+      }
+    });
+    document.getElementById("quickAddMeaning").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        saveQuickAddWord();
+      }
+    });
+    document.getElementById("actionModalBackdrop").addEventListener("click", closeActionModal);
+    document.getElementById("actionModalClose").addEventListener("click", closeActionModal);
+    document.getElementById("actionModalCancelBtn").addEventListener("click", closeActionModal);
+    document.getElementById("actionModalConfirmBtn").addEventListener("click", submitActionModal);
+    document.getElementById("actionModalInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitActionModal();
+      }
+    });
     document.getElementById("resetBtn").addEventListener("click", () => resetQuiz());
+    document.getElementById("settingsToggleBtn").addEventListener("click", () => toggleSettingsPanel());
     document.getElementById("shuffleBtn").addEventListener("click", () => {
       state.quizOrder = shuffleArray(state.quizOrder);
       state.currentIndex = 0;
@@ -2948,7 +4681,7 @@
     document.querySelectorAll("#playTabs button").forEach(btn => {
       btn.addEventListener("click", () => {
         state.playMode = btn.dataset.playMode;
-        initMatchGame();
+        resetCurrentPlayMode();
         saveState();
         render();
       });
@@ -2972,6 +4705,18 @@
       if (e.key === 'Escape' && state.lookupModalOpen) {
         e.preventDefault();
         closeLookupModal();
+        return;
+      }
+
+      if (e.key === 'Escape' && state.dialog?.open) {
+        e.preventDefault();
+        closeActionModal();
+        return;
+      }
+
+      if (e.key === 'Escape' && state.wordFormOpen && state.appSection === "vocab") {
+        e.preventDefault();
+        closeQuickAddPanel(false);
         return;
       }
 
