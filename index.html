@@ -1823,6 +1823,44 @@
       gap: 10px;
     }
 
+    .settings-data-block {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      display: grid;
+      gap: 12px;
+    }
+
+    .settings-data-head {
+      display: grid;
+      gap: 4px;
+    }
+
+    .settings-data-title {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+
+    .settings-data-sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .settings-data-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .settings-data-actions .btn {
+      width: 100%;
+      min-height: 46px;
+      justify-content: center;
+    }
+
     .setting-field {
       display: grid;
       gap: 8px;
@@ -1969,6 +2007,10 @@
       .settings-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .settings-data-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
     }
 
     @media (max-width: 820px) {
@@ -1988,6 +2030,10 @@
       }
 
       .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-data-actions {
         grid-template-columns: 1fr;
       }
     }
@@ -2609,6 +2655,19 @@
               </select>
             </label>
           </div>
+
+          <div class="settings-data-block">
+            <div class="settings-data-head">
+              <div class="settings-data-title">Dữ liệu</div>
+              <div class="settings-data-sub">Xuất và khôi phục dữ liệu để không bị mất khi đổi phiên bản file HTML.</div>
+            </div>
+            <div class="settings-data-actions">
+              <button class="btn btn-outline" id="exportExcelBtn" type="button">⬇️ Xuất Excel</button>
+              <button class="btn btn-outline" id="importExcelBtn" type="button">⬆️ Nhập Excel</button>
+              <button class="btn btn-outline" id="exportJsonBtn" type="button">💾 Xuất JSON backup</button>
+              <button class="btn btn-outline" id="importJsonBtn" type="button">♻️ Khôi phục JSON</button>
+            </div>
+          </div>
         </div>
 
         <div class="progress-top-row">
@@ -2735,6 +2794,7 @@
   </div>
 
   <input id="excelFile" type="file" accept=".xlsx,.xls" class="hidden" multiple />
+  <input id="jsonBackupFile" type="file" accept=".json" class="hidden" />
 
   <script>
 
@@ -3303,8 +3363,8 @@
       return JSON.parse(JSON.stringify(defaultSubjects));
     }
 
-    function saveState() {
-      const persistable = {
+    function getPersistableState() {
+      return {
         themeName: state.themeName,
         fontName: state.fontName,
         displayFontName: state.displayFontName,
@@ -3318,7 +3378,36 @@
         appSection: state.appSection,
         playMode: state.playMode,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(getPersistableState()));
+    }
+
+    function applyImportedState(saved) {
+      if (!saved || typeof saved !== "object") throw new Error("INVALID_BACKUP");
+      if (saved.themeName) state.themeName = saved.themeName;
+      if (saved.fontName) state.fontName = saved.fontName;
+      if (saved.displayFontName) state.displayFontName = saved.displayFontName;
+      if (saved.listeningRate) state.listeningRate = String(saved.listeningRate);
+      if (saved.selectedVoiceURI) state.selectedVoiceURI = String(saved.selectedVoiceURI);
+      state.subjects = migrateLegacyData(saved);
+      if (Array.isArray(saved.favorites)) state.favorites = saved.favorites;
+      else state.favorites = [];
+      if (Array.isArray(saved.wrongWords)) state.wrongWords = saved.wrongWords;
+      else state.wrongWords = [];
+      state.activeSubjectIndex = 0;
+      if (Number.isInteger(saved.activeSubjectIndex) && saved.activeSubjectIndex >= 0 && saved.activeSubjectIndex < state.subjects.length) {
+        state.activeSubjectIndex = saved.activeSubjectIndex;
+      }
+      if (saved.appSection === "view") state.appSection = "vocab";
+      else if (saved.appSection) state.appSection = saved.appSection;
+      if (saved.playMode) state.playMode = saved.playMode;
+      const lessons = getActiveSubject()?.lessons || [];
+      state.activeLessonIndex = 0;
+      if (Number.isInteger(saved.activeLessonIndex) && saved.activeLessonIndex >= 0 && saved.activeLessonIndex < lessons.length) {
+        state.activeLessonIndex = saved.activeLessonIndex;
+      }
     }
 
     function loadState() {
@@ -3326,24 +3415,7 @@
         const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("korean-vocab-studio-v2");
         if (!raw) return;
         const saved = JSON.parse(raw);
-        if (saved.themeName) state.themeName = saved.themeName;
-        if (saved.fontName) state.fontName = saved.fontName;
-        if (saved.displayFontName) state.displayFontName = saved.displayFontName;
-        if (saved.listeningRate) state.listeningRate = String(saved.listeningRate);
-        if (saved.selectedVoiceURI) state.selectedVoiceURI = String(saved.selectedVoiceURI);
-        state.subjects = migrateLegacyData(saved);
-        if (Array.isArray(saved.favorites)) state.favorites = saved.favorites;
-        if (Array.isArray(saved.wrongWords)) state.wrongWords = saved.wrongWords;
-        if (Number.isInteger(saved.activeSubjectIndex) && saved.activeSubjectIndex >= 0 && saved.activeSubjectIndex < state.subjects.length) {
-          state.activeSubjectIndex = saved.activeSubjectIndex;
-        }
-        if (saved.appSection === "view") state.appSection = "vocab";
-        else if (saved.appSection) state.appSection = saved.appSection;
-        if (saved.playMode) state.playMode = saved.playMode;
-        const lessons = getActiveSubject()?.lessons || [];
-        if (Number.isInteger(saved.activeLessonIndex) && saved.activeLessonIndex >= 0 && saved.activeLessonIndex < lessons.length) {
-          state.activeLessonIndex = saved.activeLessonIndex;
-        }
+        applyImportedState(saved);
       } catch (err) {
         console.error("Không thể tải dữ liệu đã lưu", err);
       }
@@ -3721,6 +3793,100 @@
       reader.readAsArrayBuffer(file);
     }
 
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 600);
+    }
+
+    function exportVocabularyExcel() {
+      try {
+        const rows = [];
+        state.subjects.forEach(subject => {
+          (subject.lessons || []).forEach(lesson => {
+            (lesson.words || []).forEach(word => {
+              rows.push({
+                "Môn học": subject.name,
+                "Bài học": lesson.name,
+                "Từ tiếng Hàn": word.vocab,
+                "Nghĩa tiếng Việt": word.meaning,
+                "Yêu thích": state.favorites.includes(word.vocab) ? "Có" : "",
+                "Cần ôn": state.wrongWords.some(item => normalizeText(item.vocab) === normalizeText(word.vocab)) ? "Có" : "",
+                "Nguồn": lesson.sourceFile || subject.sourceFile || "",
+              });
+            });
+          });
+        });
+
+        const workbook = XLSX.utils.book_new();
+        const vocabSheet = XLSX.utils.json_to_sheet(rows.length ? rows : [{
+          "Môn học": "",
+          "Bài học": "",
+          "Từ tiếng Hàn": "",
+          "Nghĩa tiếng Việt": "",
+          "Yêu thích": "",
+          "Cần ôn": "",
+          "Nguồn": "",
+        }]);
+        XLSX.utils.book_append_sheet(workbook, vocabSheet, "Vocabulary");
+
+        const infoSheet = XLSX.utils.json_to_sheet([{
+          "Môn hiện tại": getActiveSubject()?.name || "",
+          "Bài hiện tại": getActiveLesson()?.name || "",
+          "Số môn": state.subjects.length,
+          "Số từ": getAllWords().length,
+          "Ngày xuất": new Date().toLocaleString("vi-VN"),
+        }]);
+        XLSX.utils.book_append_sheet(workbook, infoSheet, "Info");
+
+        XLSX.writeFile(workbook, `korean-vocabulary-export-${new Date().toISOString().slice(0,10)}.xlsx`);
+        hideError();
+      } catch (err) {
+        console.error(err);
+        showError("Không thể xuất file Excel.");
+      }
+    }
+
+    function exportJsonBackup() {
+      try {
+        const payload = {
+          app: "korean-vocabulary-studio",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          data: getPersistableState(),
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+        downloadBlob(blob, `korean-vocabulary-backup-${new Date().toISOString().slice(0,10)}.json`);
+        hideError();
+      } catch (err) {
+        console.error(err);
+        showError("Không thể xuất file JSON backup.");
+      }
+    }
+
+    function importJsonBackupFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(String(e.target.result || "{}"));
+          const saved = parsed?.data && typeof parsed.data === "object" ? parsed.data : parsed;
+          applyImportedState(saved);
+          saveState();
+          hideError();
+          resetQuiz();
+        } catch (err) {
+          console.error(err);
+          showError("File JSON backup không hợp lệ hoặc không đọc được.");
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
     function getStudyPool() {
       const words = getWords();
       if (state.onlyWrongPool && state.wrongWords.length) {
@@ -3847,6 +4013,9 @@
       else markWrongWord(current);
       playFeedbackSound(correct);
       render();
+      if ((state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") && current?.vocab) {
+        setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 120);
+      }
     }
 
     function jumpToCard(targetIndex) {
@@ -3886,7 +4055,7 @@
     function selectChoice(choice) {
       if (state.feedback) return;
       state.selectedChoice = choice;
-      renderQuestion();
+      handleSubmit();
     }
 
     function moveChoiceSelection(step) {
@@ -4063,6 +4232,9 @@
         playFeedbackSound(false);
       }
       renderQuestion();
+      if (state.judgeCurrent?.vocab) {
+        setTimeout(() => speakKorean(state.judgeCurrent.vocab, Number(state.listeningRate)), 120);
+      }
     }
 
     function advanceJudgeRound() {
@@ -4576,6 +4748,17 @@
       files.forEach(file => parseWorkbook(file));
       e.target.value = "";
     });
+
+    document.getElementById("jsonBackupFile").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) importJsonBackupFile(file);
+      e.target.value = "";
+    });
+
+    document.getElementById("exportExcelBtn").addEventListener("click", exportVocabularyExcel);
+    document.getElementById("importExcelBtn").addEventListener("click", () => document.getElementById("excelFile")?.click());
+    document.getElementById("exportJsonBtn").addEventListener("click", exportJsonBackup);
+    document.getElementById("importJsonBtn").addEventListener("click", () => document.getElementById("jsonBackupFile")?.click());
 
     document.getElementById("createSubjectBtn").addEventListener("click", () => createSubject());
     document.getElementById("createLessonBtn").addEventListener("click", () => createLesson());
