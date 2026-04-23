@@ -1025,28 +1025,48 @@
     }
 
     .section-hidden { display: none !important; }
-    .match-wrap { width: min(100%, 1420px); max-width: 1420px; margin: 24px auto 0; }
+    .play-card {
+      padding: 22px 20px 20px;
+    }
+    .play-card .question-meta {
+      margin-bottom: 6px;
+      font-size: 11px;
+      letter-spacing: .14em;
+    }
+    .play-card .question-label {
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .play-card .action-row {
+      margin-top: 14px;
+      gap: 10px;
+    }
+    .play-card .feedback {
+      margin-top: 14px;
+      padding: 14px 16px;
+    }
+    .match-wrap { width: min(100%, 1260px); max-width: 1260px; margin: 14px auto 0; }
     .match-board {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-      margin-top: 22px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
       align-items: stretch;
     }
     .match-card {
-      min-height: 122px;
-      padding: 22px 20px;
-      border-radius: 24px;
+      min-height: 96px;
+      padding: 16px 16px;
+      border-radius: 20px;
       border: 1px solid var(--border);
       background: color-mix(in srgb, var(--panel) 92%, black 8%);
       color: var(--text);
       font-family: var(--app-font);
-      font-size: clamp(24px, 2.1vw, 32px);
+      font-size: clamp(19px, 1.5vw, 26px);
       font-weight: 800;
-      line-height: 1.28;
+      line-height: 1.22;
       letter-spacing: -.02em;
       cursor: pointer;
-      box-shadow: 0 10px 22px rgba(0,0,0,.12);
+      box-shadow: 0 8px 18px rgba(0,0,0,.10);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1055,19 +1075,19 @@
       overflow-wrap: anywhere;
       word-break: break-word;
     }
-    .match-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(125,211,252,.18), 0 16px 26px rgba(56,189,248,.16); transform: translateY(-1px); }
-    .match-card.matched { opacity: .45; border-color: var(--success); pointer-events: none; }
+    .match-card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(125,211,252,.18), 0 12px 22px rgba(56,189,248,.14); transform: translateY(-1px); }
+    .match-card.matched { opacity: .48; border-color: var(--success); pointer-events: none; }
     .match-card.wrong { border-color: var(--danger); }
     .match-top {
       display:flex;
       justify-content:space-between;
-      gap:14px;
+      gap:10px;
       flex-wrap:wrap;
       align-items:center;
       color:var(--muted);
-      font-size:18px;
+      font-size:16px;
       font-weight:800;
-      line-height:1.5;
+      line-height:1.45;
     }
     .judge-wrap { width: min(100%, 1080px); max-width: 1080px; margin: 18px auto 0; display: grid; gap: 18px; }
     .judge-top { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:15px; font-weight:700; }
@@ -1080,14 +1100,23 @@
     .judge-btn.true { background: linear-gradient(180deg, rgba(34,197,94,.16), rgba(34,197,94,.08)); border: 1px solid rgba(34,197,94,.42); color: #dcfce7; }
     .judge-btn.false { background: linear-gradient(180deg, rgba(244,63,94,.16), rgba(244,63,94,.08)); border: 1px solid rgba(244,63,94,.42); color: #ffe4e6; }
     @media (max-width: 720px) {
+      .play-card {
+        padding: 18px 14px 16px;
+      }
+      .play-card .question-label {
+        font-size: 13px;
+      }
       .match-board, .judge-actions { grid-template-columns: 1fr; }
+      .match-wrap {
+        margin-top: 12px;
+      }
       .match-card {
-        min-height: 98px;
-        font-size: clamp(20px, 6vw, 24px);
-        padding: 18px 16px;
+        min-height: 82px;
+        font-size: clamp(18px, 5.2vw, 22px);
+        padding: 14px 12px;
       }
       .match-top {
-        font-size: 15px;
+        font-size: 14px;
       }
     }
 
@@ -1307,8 +1336,8 @@
       .flashcard { min-height: 210px; }
       .flashcard-main { font-size: clamp(38px, 3.8vw, 58px); }
       .flashcard-actions { justify-content: center; }
-      .match-wrap { width: min(100%, 1360px); max-width: 1360px; margin-inline: auto; }
-      .match-board { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+      .match-wrap { width: min(100%, 1260px); max-width: 1260px; margin-inline: auto; }
+      .match-board { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
     }
 
 
@@ -1762,6 +1791,11 @@
       flex-wrap: wrap;
       justify-content: flex-end;
       align-items: center;
+    }
+    .toolbar-cta-group .btn {
+      min-height: 40px;
+      padding: 10px 14px;
+      white-space: nowrap;
     }
 
     .toolbar-chip-row {
@@ -4436,12 +4470,12 @@
           if (!state.judgeCurrent) initJudgeGame();
           const isFinished = state.judgeRound >= state.judgeTotal;
           const currentJudge = state.judgeCurrent;
-          area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="judge-wrap"><div class="judge-top"><div>Điểm: ${state.judgeScore}/${state.judgeTotal}</div><div>Câu: ${Math.min(state.judgeRound + 1, state.judgeTotal)} / ${state.judgeTotal}</div></div>${isFinished ? `<div class="feedback correct"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div>Bạn đúng <b>${state.judgeScore}/${state.judgeTotal}</b> câu.</div></div><div class="action-row"><button class="btn btn-outline" onclick="initJudgeGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div>` : `<div class="judge-card"><div class="judge-korean">${escapeHtml(currentJudge?.vocab || "")}</div><div class="judge-divider">có nghĩa là</div><div class="judge-meaning">${escapeHtml(currentJudge?.shownMeaning || "")}</div></div><div class="judge-actions">${state.judgeAnswered ? `<button class="btn judge-btn ${currentJudge?.isCorrect ? "true" : "false"}" disabled>${currentJudge?.isCorrect ? "✅ Mệnh đề đúng" : "❌ Mệnh đề sai"}</button><button class="btn btn-primary judge-btn" onclick="advanceJudgeRound()">Câu tiếp theo →</button>` : `<button class="btn judge-btn true" onclick="handleJudgeAnswer(true)">⭕ Đúng</button><button class="btn judge-btn false" onclick="handleJudgeAnswer(false)">✖ Sai</button>`}</div>${state.judgeAnswered ? `<div class="feedback ${state.judgeLastCorrect ? "correct" : "wrong"}" style="margin-top:0;"><div style="font-weight:800; margin-bottom:8px;">${state.judgeLastCorrect ? "✅ Chính xác" : "❌ Chưa đúng"}</div><div style="font-size:14px; line-height:1.7; color:#e5eefc;">Đáp án đúng: <b>${escapeHtml(currentJudge?.vocab || "")}</b> = <b>${escapeHtml(currentJudge?.correctMeaning || "")}</b>.</div></div>` : ``}`}</div></div>`;
+          area.innerHTML = `<div class="card question-card play-card play-card-judge"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="judge-wrap"><div class="judge-top"><div>Điểm: ${state.judgeScore}/${state.judgeTotal}</div><div>Câu: ${Math.min(state.judgeRound + 1, state.judgeTotal)} / ${state.judgeTotal}</div></div>${isFinished ? `<div class="feedback correct"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div>Bạn đúng <b>${state.judgeScore}/${state.judgeTotal}</b> câu.</div></div><div class="action-row"><button class="btn btn-outline" onclick="initJudgeGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div>` : `<div class="judge-card"><div class="judge-korean">${escapeHtml(currentJudge?.vocab || "")}</div><div class="judge-divider">có nghĩa là</div><div class="judge-meaning">${escapeHtml(currentJudge?.shownMeaning || "")}</div></div><div class="judge-actions">${state.judgeAnswered ? `<button class="btn judge-btn ${currentJudge?.isCorrect ? "true" : "false"}" disabled>${currentJudge?.isCorrect ? "✅ Mệnh đề đúng" : "❌ Mệnh đề sai"}</button><button class="btn btn-primary judge-btn" onclick="advanceJudgeRound()">Câu tiếp theo →</button>` : `<button class="btn judge-btn true" onclick="handleJudgeAnswer(true)">⭕ Đúng</button><button class="btn judge-btn false" onclick="handleJudgeAnswer(false)">✖ Sai</button>`}</div>${state.judgeAnswered ? `<div class="feedback ${state.judgeLastCorrect ? "correct" : "wrong"}" style="margin-top:0;"><div style="font-weight:800; margin-bottom:8px;">${state.judgeLastCorrect ? "✅ Chính xác" : "❌ Chưa đúng"}</div><div style="font-size:14px; line-height:1.7; color:#e5eefc;">Đáp án đúng: <b>${escapeHtml(currentJudge?.vocab || "")}</b> = <b>${escapeHtml(currentJudge?.correctMeaning || "")}</b>.</div></div>` : ``}`}</div></div>`;
           return;
         }
         if (!state.matchPairs.length) initMatchGame();
         const done = state.matchMatchedCount >= Math.min(6, getWords().length);
-        area.innerHTML = `<div class="card question-card"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div style="font-size:16px; line-height:1.7;">Bạn đã ghép đúng toàn bộ thẻ của lượt chơi này.</div></div>` : ``}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div></div></div>`;
+        area.innerHTML = `<div class="card question-card play-card play-card-match"><div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div><div class="question-label">Chọn hai thẻ tương ứng: một từ tiếng Hàn và một nghĩa tiếng Việt</div><div class="match-wrap"><div class="match-top"><div>Đã ghép: ${state.matchMatchedCount}/${Math.min(6, getWords().length)} cặp</div><div>Lượt chọn: ${state.matchMoves}</div></div><div class="match-board">${state.matchPairs.map(card => `<button class="match-card ${state.matchSelection.includes(card.id) ? "active" : ""} ${card.matched ? "matched" : ""} ${card.wrong ? "wrong" : ""}" onclick='handleMatchCard(${JSON.stringify(card.id)})'>${escapeHtml(card.text)}</button>`).join("")}</div>${done ? `<div class="feedback correct" style="margin-top:18px;"><div style="font-weight:800; margin-bottom:8px;">🎉 Hoàn thành</div><div style="font-size:16px; line-height:1.7;">Bạn đã ghép đúng toàn bộ thẻ của lượt chơi này.</div></div>` : ``}<div class="action-row"><button class="btn btn-outline" onclick="initMatchGame(); renderQuestion();">🔄 Chơi lại</button><button class="btn btn-primary" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button></div></div></div>`;
         return;
       }
       if (!current) {
