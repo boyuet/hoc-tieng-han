@@ -2738,7 +2738,7 @@
           <div class="toolbar-cta-group">
             <button class="btn btn-outline" id="shuffleBtn">↻ Trộn</button>
             <button class="btn btn-outline" id="onlyWrongBtn">Ôn từ cần ôn</button>
-            <button class="btn btn-outline" id="clearReviewBtn">Đã thuộc</button>
+            <button class="btn btn-outline" id="clearReviewBtn">✅ Đã thuộc</button>
             <button class="btn btn-outline" id="resetBtn">Làm mới</button>
             <button class="btn btn-outline" id="settingsToggleBtn">⚙️ Tùy chỉnh</button>
           </div>
@@ -2997,6 +2997,7 @@
       displayFontName: "noto-kr",
       onlyFavorites: false,
       onlyWrongPool: false,
+      onlyMasteredPool: false,
       wrongWords: [],
       reviewWords: [],
       sessionRemovedKeys: [],
@@ -3209,6 +3210,42 @@
       return isWrongWord(word) || isManualReviewWord(word);
     }
 
+    function getCurrentLessonReviewWords() {
+      return getWords().filter(w => isNeedsReviewWord(w));
+    }
+
+    function enterReviewMode() {
+      sanitizeReviewLists();
+      state.onlyWrongPool = true;
+      state.onlyMasteredPool = false;
+      resetQuiz();
+    }
+
+    function enterMasteredMode() {
+      sanitizeReviewLists();
+      state.onlyWrongPool = false;
+      state.onlyMasteredPool = true;
+      resetQuiz();
+    }
+
+    function exitSpecialStudyMode() {
+      state.onlyWrongPool = false;
+      state.onlyMasteredPool = false;
+      resetQuiz();
+    }
+
+    function exitReviewMode() {
+      exitSpecialStudyMode();
+    }
+
+    function refreshReviewMode() {
+      // Bấm lại “Ôn từ cần ôn” chỉ làm mới hàng đợi từ các từ còn cần ôn,
+      // không tắt chế độ và không xóa danh sách cần ôn đã lưu.
+      state.onlyWrongPool = true;
+      state.onlyMasteredPool = false;
+      resetQuiz();
+    }
+
     function upsertWordInto(listName, word, meta = {}) {
       if (!word || !wordKey(word)) return;
       const list = Array.isArray(state[listName]) ? state[listName] : [];
@@ -3240,11 +3277,16 @@
 
     function markWordMastered(word = getCurrent()) {
       if (!word || !wordKey(word)) return;
-      removeWordFrom("wrongWords", word);
-      removeWordFrom("reviewWords", word);
+      const key = wordKey(word);
+      // Chỉ bỏ đúng từ hiện tại khỏi 2 danh sách cần ôn.
+      // Không rebuild toàn bộ danh sách, tránh lỗi mất hết từ cần ôn khi đang ở chế độ ôn.
+      state.wrongWords = (Array.isArray(state.wrongWords) ? state.wrongWords : [])
+        .filter(item => wordKey(item) !== key);
+      state.reviewWords = (Array.isArray(state.reviewWords) ? state.reviewWords : [])
+        .filter(item => wordKey(item) !== key);
+      sanitizeReviewLists();
       saveState();
 
-      // Xóa mọi bản sao của từ này trong lượt học hiện tại, kể cả bản được chèn do trả lời sai.
       advanceAfterReviewAction(word, { removeFromQueue: false, skipThisTurn: true });
     }
 
@@ -4229,13 +4271,18 @@
       if (state.onlyWrongPool) {
         return words.filter(w => isNeedsReviewWord(w));
       }
+      if (state.onlyMasteredPool) {
+        // Nhóm “Đã thuộc” chỉ là bộ lọc để xem/học các từ KHÔNG còn nằm trong danh sách cần ôn.
+        // Không được xóa reviewWords/wrongWords khi chỉ chuyển tab.
+        return words.filter(w => !isNeedsReviewWord(w));
+      }
       return words;
     }
 
     function buildQuizSource() {
       const words = getWords();
       const source = getStudyPool();
-      if (state.onlyWrongPool) return source;
+      if (state.onlyWrongPool || state.onlyMasteredPool) return source;
       return source.length ? source : words;
     }
 
@@ -4823,7 +4870,7 @@
       }
       if (!current) {
         const emptyMessage = state.onlyWrongPool
-          ? `Hiện không còn từ nào trong danh sách cần ôn của bài này.<br><br><button class="btn btn-primary" onclick="state.onlyWrongPool=false; resetQuiz();">Học tất cả từ</button>`
+          ? `Hiện không còn từ nào trong danh sách cần ôn của bài này.<br><br><button class="btn btn-primary" onclick="exitReviewMode();">Học tất cả từ</button>`
           : `Bài này chưa có từ vựng. Hãy thêm từ vào bài hiện tại.`;
         area.innerHTML = `<div class="card question-card"><div style="text-align:center;color:var(--muted); line-height:1.8;">${emptyMessage}</div></div>`;
         return;
@@ -5170,8 +5217,17 @@
       if (reviewFilterBtn) reviewFilterBtn.textContent = state.onlyWrongPool ? "Tất cả từ" : "Từ cần ôn";
       const onlyWrongButton = document.getElementById("onlyWrongBtn");
       if (onlyWrongButton) {
-        onlyWrongButton.textContent = state.onlyWrongPool ? "Đang ôn từ cần ôn" : "Ôn từ cần ôn";
+        const reviewCount = getCurrentLessonReviewWords().length;
+        onlyWrongButton.textContent = state.onlyWrongPool ? `Đang ôn từ cần ôn (${reviewCount})` : `Ôn từ cần ôn (${reviewCount})`;
         onlyWrongButton.classList.toggle("btn-review-active", state.onlyWrongPool);
+        onlyWrongButton.title = "Chuyển sang nhóm từ cần ôn. Chỉ chuyển chế độ, không xóa danh sách cần ôn.";
+      }
+      const clearReviewButton = document.getElementById("clearReviewBtn");
+      if (clearReviewButton) {
+        const masteredCount = getWords().filter(w => !isNeedsReviewWord(w)).length;
+        clearReviewButton.textContent = `✅ Đã thuộc (${masteredCount})`;
+        clearReviewButton.classList.toggle("btn-review-active", state.onlyMasteredPool);
+        clearReviewButton.title = "Chuyển sang nhóm từ đã thuộc. Nút này KHÔNG xóa từ cần ôn.";
       }
 
       const vocabTitleEl = document.getElementById("vocabSectionTitle");
@@ -5253,7 +5309,11 @@
       }
     });
     document.getElementById("resetBtn").addEventListener("click", () => resetQuiz());
-    document.getElementById("clearReviewBtn").addEventListener("click", () => clearCurrentLessonReview());
+    document.getElementById("clearReviewBtn").addEventListener("click", () => {
+      // Đây là nút chọn nhóm “Đã thuộc”, KHÔNG phải nút xóa từ cần ôn.
+      // Muốn bỏ đúng từ hiện tại khỏi danh sách cần ôn thì dùng nút “✅ Đã thuộc” nằm trong thẻ flashcard/câu hỏi.
+      enterMasteredMode();
+    });
     document.getElementById("settingsToggleBtn").addEventListener("click", () => toggleSettingsPanel());
     document.getElementById("shuffleBtn").addEventListener("click", () => {
       state.quizOrder = shuffleArray(state.quizOrder);
@@ -5264,8 +5324,7 @@
       render();
     });
     document.getElementById("onlyWrongBtn").addEventListener("click", () => {
-      state.onlyWrongPool = !state.onlyWrongPool;
-      resetQuiz();
+      refreshReviewMode();
     });
     document.getElementById("themeSelect").addEventListener("change", (e) => {
       state.themeName = e.target.value;
@@ -5318,6 +5377,7 @@
     });
     document.getElementById("toggleReviewFilterBtn").addEventListener("click", () => {
       state.onlyWrongPool = !state.onlyWrongPool;
+      if (state.onlyWrongPool) state.onlyMasteredPool = false;
       if (state.appSection === "study") resetQuiz();
       else {
         renderWords();
