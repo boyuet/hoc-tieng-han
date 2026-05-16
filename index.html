@@ -2616,6 +2616,79 @@
       }
     }
 
+
+    /* ===== review queue & active recall polish ===== */
+    .review-btn.active,
+    .btn-review-active {
+      background: linear-gradient(135deg, #f59e0b, #f97316) !important;
+      color: #170b02 !important;
+      border-color: transparent !important;
+      box-shadow: 0 12px 24px rgba(249,115,22,.18);
+    }
+
+    .review-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(245,158,11,.14);
+      border: 1px solid rgba(245,158,11,.34);
+      color: #fde68a;
+      font-family: var(--app-font);
+      font-size: 12px;
+      font-weight: 800;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    .word-item.needs-review {
+      border-color: rgba(245,158,11,.55);
+      background:
+        linear-gradient(180deg, rgba(245,158,11,.10), rgba(245,158,11,.035)),
+        color-mix(in srgb, var(--panel) 92%, black 8%);
+      box-shadow: inset 4px 0 0 rgba(245,158,11,.78), 0 12px 28px rgba(0,0,0,.14);
+    }
+
+    .word-study-meta {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .study-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--border) 88%, white 12%);
+      background: rgba(255,255,255,.035);
+    }
+
+    .question-review-line {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .review-toolbar-hint {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      width: 100%;
+    }
+
   </style>
 </head>
 <body data-theme="dark-blue" data-font="jakarta" data-display-font="noto-kr">
@@ -2664,7 +2737,8 @@
           </div>
           <div class="toolbar-cta-group">
             <button class="btn btn-outline" id="shuffleBtn">↻ Trộn</button>
-            <button class="btn btn-outline" id="onlyWrongBtn">Ôn từ sai</button>
+            <button class="btn btn-outline" id="onlyWrongBtn">Ôn từ cần ôn</button>
+            <button class="btn btn-outline" id="clearReviewBtn">Đã thuộc</button>
             <button class="btn btn-outline" id="resetBtn">Làm mới</button>
             <button class="btn btn-outline" id="settingsToggleBtn">⚙️ Tùy chỉnh</button>
           </div>
@@ -2776,6 +2850,7 @@
             <span class="muted-inline">⭐ <span id="chipFavCountInline">0</span></span>
             <button class="btn btn-outline" id="addWordBtn">＋ Thêm từ vào bài</button>
             <button class="btn btn-ghost" id="toggleFavoritesFilterBtn">Từ yêu thích</button>
+            <button class="btn btn-ghost" id="toggleReviewFilterBtn">Từ cần ôn</button>
           </div>
         </div>
 
@@ -2923,6 +2998,7 @@
       onlyFavorites: false,
       onlyWrongPool: false,
       wrongWords: [],
+      reviewWords: [],
       favorites: [],
       subjects: JSON.parse(JSON.stringify(defaultSubjects)),
       activeSubjectIndex: 0,
@@ -3014,6 +3090,100 @@
 
     function getCurrent() {
       return state.quizOrder[state.currentIndex] || null;
+    }
+
+
+    function wordKey(wordOrVocab) {
+      const raw = typeof wordOrVocab === "string" ? wordOrVocab : wordOrVocab?.vocab;
+      return normalizeText(raw);
+    }
+
+    function sameWord(a, b) {
+      return wordKey(a) === wordKey(b);
+    }
+
+    function sanitizeReviewLists() {
+      const uniqueByKey = (items) => {
+        const seen = new Set();
+        return (Array.isArray(items) ? items : [])
+          .filter(item => item && wordKey(item))
+          .map(item => typeof item === "string" ? { vocab: item, meaning: "" } : item)
+          .filter(item => {
+            const key = wordKey(item);
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+      };
+      state.wrongWords = uniqueByKey(state.wrongWords);
+      state.reviewWords = uniqueByKey(state.reviewWords);
+    }
+
+    function isWrongWord(word) {
+      const key = wordKey(word);
+      return !!key && state.wrongWords.some(item => wordKey(item) === key);
+    }
+
+    function isManualReviewWord(word) {
+      const key = wordKey(word);
+      return !!key && state.reviewWords.some(item => wordKey(item) === key);
+    }
+
+    function isNeedsReviewWord(word) {
+      return isWrongWord(word) || isManualReviewWord(word);
+    }
+
+    function upsertWordInto(listName, word, meta = {}) {
+      if (!word || !wordKey(word)) return;
+      const list = Array.isArray(state[listName]) ? state[listName] : [];
+      const key = wordKey(word);
+      const existingIndex = list.findIndex(item => wordKey(item) === key);
+      const payload = { ...word, ...meta, vocab: word.vocab, meaning: word.meaning };
+      if (existingIndex >= 0) list[existingIndex] = { ...list[existingIndex], ...payload };
+      else list.push(payload);
+      state[listName] = list;
+    }
+
+    function removeWordFrom(listName, word) {
+      const key = wordKey(word);
+      if (!key || !Array.isArray(state[listName])) return;
+      state[listName] = state[listName].filter(item => wordKey(item) !== key);
+    }
+
+    function toggleReviewWord(word) {
+      if (!word || !wordKey(word)) return;
+      if (isManualReviewWord(word)) removeWordFrom("reviewWords", word);
+      else upsertWordInto("reviewWords", word, { markedAt: new Date().toISOString(), source: "manual" });
+      saveState();
+      render();
+    }
+
+    function markWordMastered(word = getCurrent()) {
+      if (!word || !wordKey(word)) return;
+      removeWordFrom("wrongWords", word);
+      removeWordFrom("reviewWords", word);
+      saveState();
+      if (state.onlyWrongPool && !getStudyPool().length) state.onlyWrongPool = false;
+      resetQuiz();
+    }
+
+    function clearCurrentLessonReview() {
+      const words = getWords();
+      if (!words.length) return;
+      state.wrongWords = state.wrongWords.filter(item => !words.some(w => sameWord(w, item)));
+      state.reviewWords = state.reviewWords.filter(item => !words.some(w => sameWord(w, item)));
+      state.onlyWrongPool = false;
+      saveState();
+      resetQuiz();
+    }
+
+    function scheduleWrongRetry(word) {
+      if (!word || !wordKey(word) || !state.quizOrder.length) return;
+      const remaining = state.quizOrder.slice(state.currentIndex + 1);
+      const alreadySoon = remaining.slice(0, 3).some(item => sameWord(item, word));
+      if (alreadySoon) return;
+      const insertAt = Math.min(state.quizOrder.length, state.currentIndex + 3);
+      state.quizOrder.splice(insertAt, 0, word);
     }
 
     function buildOptionsForCurrent(current) {
@@ -3454,6 +3624,7 @@
         subjects: state.subjects,
         favorites: state.favorites,
         wrongWords: state.wrongWords,
+        reviewWords: state.reviewWords,
         activeSubjectIndex: state.activeSubjectIndex,
         activeLessonIndex: state.activeLessonIndex,
         appSection: state.appSection,
@@ -3462,7 +3633,12 @@
     }
 
     function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(getPersistableState()));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(getPersistableState()));
+      } catch (err) {
+        console.error(err);
+        showError("Trình duyệt không thể lưu dữ liệu. Hãy xuất JSON backup để tránh mất dữ liệu.");
+      }
     }
 
     function applyImportedState(saved) {
@@ -3477,6 +3653,9 @@
       else state.favorites = [];
       if (Array.isArray(saved.wrongWords)) state.wrongWords = saved.wrongWords;
       else state.wrongWords = [];
+      if (Array.isArray(saved.reviewWords)) state.reviewWords = saved.reviewWords;
+      else state.reviewWords = [];
+      sanitizeReviewLists();
       state.activeSubjectIndex = 0;
       if (Number.isInteger(saved.activeSubjectIndex) && saved.activeSubjectIndex >= 0 && saved.activeSubjectIndex < state.subjects.length) {
         state.activeSubjectIndex = saved.activeSubjectIndex;
@@ -3811,8 +3990,6 @@
       if (!state.subjects[subjectIndex]?.lessons?.[lessonIndex]) return;
       state.activeSubjectIndex = subjectIndex;
       state.activeLessonIndex = lessonIndex;
-      state.wrongWords = [];
-      state.favorites = [];
       saveState();
       resetQuiz();
     }
@@ -3861,8 +4038,6 @@
 
           subject.lessons.push(...addedLessons);
           state.activeLessonIndex = subject.lessons.length - addedLessons.length;
-          state.wrongWords = [];
-          state.favorites = [];
           hideError();
           saveState();
           resetQuiz();
@@ -3897,7 +4072,7 @@
                 "Từ tiếng Hàn": word.vocab,
                 "Nghĩa tiếng Việt": word.meaning,
                 "Yêu thích": state.favorites.includes(word.vocab) ? "Có" : "",
-                "Cần ôn": state.wrongWords.some(item => normalizeText(item.vocab) === normalizeText(word.vocab)) ? "Có" : "",
+                "Cần ôn": isNeedsReviewWord(word) ? "Có" : "",
                 "Nguồn": lesson.sourceFile || subject.sourceFile || "",
               });
             });
@@ -3970,8 +4145,9 @@
 
     function getStudyPool() {
       const words = getWords();
-      if (state.onlyWrongPool && state.wrongWords.length) {
-        return words.filter(w => state.wrongWords.some(x => normalizeText(x.vocab) === normalizeText(w.vocab)));
+      if (state.onlyWrongPool) {
+        const reviewPool = words.filter(w => isNeedsReviewWord(w));
+        return reviewPool.length ? reviewPool : words;
       }
       return words;
     }
@@ -3998,10 +4174,13 @@
     }
 
     function markWrongWord(word) {
-      if (!state.wrongWords.some(item => normalizeText(item.vocab) === normalizeText(word.vocab))) {
-        state.wrongWords.push(word);
-        saveState();
-      }
+      if (!word || !wordKey(word)) return;
+      upsertWordInto("wrongWords", word, {
+        wrongAt: new Date().toISOString(),
+        wrongCount: (state.wrongWords.find(item => sameWord(item, word))?.wrongCount || 0) + 1,
+        source: "wrong-answer",
+      });
+      saveState();
     }
 
     function toggleFavorite(vocab) {
@@ -4091,7 +4270,10 @@
       state.feedback = { correct };
       state.completed += 1;
       if (correct) state.score += 1;
-      else markWrongWord(current);
+      else {
+        markWrongWord(current);
+        scheduleWrongRetry(current);
+      }
       playFeedbackSound(correct);
       render();
       if ((state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") && current?.vocab) {
@@ -4235,6 +4417,7 @@
       const totalWords = activeLesson?.words.length || 0;
       const progress = state.quizOrder.length ? Math.round((state.completed / state.quizOrder.length) * 100) : 0;
       const wrongCount = Math.max(state.completed - state.score, 0);
+      const lessonReviewCount = (activeLesson?.words || []).filter(w => isNeedsReviewWord(w)).length;
 
       document.getElementById("miniProgress").textContent = `${progress}%`;
       document.getElementById("miniScore").textContent = `${state.score}/${state.completed || 0}`;
@@ -4243,7 +4426,7 @@
       document.getElementById("progressFill").style.width = `${progress}%`;
       document.getElementById("chipFavCountInline").textContent = state.favorites.length;
       document.getElementById("chipFav").textContent = `${state.favorites.length} yêu thích`;
-      document.getElementById("chipWrong").textContent = `${state.wrongWords.length} cần ôn`;
+      document.getElementById("chipWrong").textContent = `${lessonReviewCount} cần ôn trong bài`;
     }
 
     function questionToneClass() {
@@ -4506,7 +4689,13 @@
 
           <div class="question-head-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe lại</button>
+            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>${isManualReviewWord(current) ? "✓ Đã đánh dấu ôn" : "📌 Đánh dấu cần ôn"}</button>
+            <button class="btn btn-outline" onclick='markWordMastered(${JSON.stringify(current)})'>✅ Đã thuộc</button>
             <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
+          </div>
+          <div class="question-review-line">
+            ${isWrongWord(current) ? `<span class="study-pill">⚠️ Từng chọn sai</span>` : ``}
+            ${isManualReviewWord(current) ? `<span class="study-pill">📌 Bạn đã đánh dấu cần ôn</span>` : ``}
           </div>
       `;
 
@@ -4548,6 +4737,8 @@
           <div class="flashcard-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe từ</button>
             <button class="btn btn-primary" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
+            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>📌 Cần ôn</button>
+            <button class="btn btn-outline" onclick='markWordMastered(${JSON.stringify(current)})'>✅ Đã thuộc</button>
             <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
           </div>
         `;
@@ -4607,6 +4798,7 @@
       const q = normalizeText(state.search);
       let result = [...words];
       if (state.onlyFavorites) result = result.filter(w => state.favorites.includes(w.vocab));
+      if (state.onlyWrongPool) result = result.filter(w => isNeedsReviewWord(w));
       if (q) result = result.filter(w => normalizeText(w.vocab).includes(q) || normalizeText(w.meaning).includes(q));
       const list = document.getElementById("wordList");
       if (!lesson) {
@@ -4619,8 +4811,10 @@
       }
       list.innerHTML = result.map(w => {
         const wordEditing = state.inlineEdit?.kind === 'word' && state.inlineEdit.wordId === w.id;
+        const needsReview = isNeedsReviewWord(w);
+        const wrongItem = state.wrongWords.find(item => sameWord(item, w));
         return `
-        <div class="word-item">
+        <div class="word-item ${needsReview ? "needs-review" : ""}">
           <div class="word-head">
             <div style="min-width:0; flex:1;">
               ${wordEditing ? `
@@ -4632,12 +4826,18 @@
                     <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
                   </div>
                 </div>` : `
-                <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""}</div>
-                <div class="word-meaning">${escapeHtml(w.meaning)}</div>`}
+                <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""} ${needsReview ? `<span class="review-badge">📌 cần ôn</span>` : ""}</div>
+                <div class="word-meaning">${escapeHtml(w.meaning)}</div>
+                <div class="word-study-meta">
+                  ${wrongItem ? `<span class="study-pill">Sai ${Number(wrongItem.wrongCount || 1)} lần</span>` : ``}
+                  ${isManualReviewWord(w) ? `<span class="study-pill">Tự đánh dấu</span>` : ``}
+                </div>`}
             </div>
             <div class="word-actions">
-              <button class="btn btn-ghost" onclick='toggleFavorite(${JSON.stringify(w.vocab)})'>⭐</button>
-              <button class="btn btn-ghost" onclick='speakKorean(${JSON.stringify(w.vocab)}, Number(state.listeningRate))'>🔊</button>
+              <button class="btn btn-ghost" title="Yêu thích" onclick='toggleFavorite(${JSON.stringify(w.vocab)})'>⭐</button>
+              <button class="btn btn-ghost review-btn ${isManualReviewWord(w) ? "active" : ""}" title="Đánh dấu cần ôn" onclick='toggleReviewWord(${JSON.stringify(w)})'>📌</button>
+              <button class="btn btn-ghost" title="Bỏ khỏi danh sách cần ôn" onclick='markWordMastered(${JSON.stringify(w)})'>✅</button>
+              <button class="btn btn-ghost" title="Nghe phát âm" onclick='speakKorean(${JSON.stringify(w.vocab)}, Number(state.listeningRate))'>🔊</button>
               <button class="btn btn-ghost" onclick='editWord(${JSON.stringify(w.id)})'>✏️</button>
               <button class="btn btn-ghost" onclick='deleteWord(${JSON.stringify(w.id)})'>🗑️</button>
             </div>
@@ -4803,7 +5003,13 @@
       populateVoiceSelect();
 
       document.getElementById("toggleFavoritesFilterBtn").textContent = state.onlyFavorites ? "Tất cả từ" : "Từ yêu thích";
-      document.getElementById("onlyWrongBtn").textContent = state.onlyWrongPool ? "Đang ôn từ sai" : "Ôn từ sai";
+      const reviewFilterBtn = document.getElementById("toggleReviewFilterBtn");
+      if (reviewFilterBtn) reviewFilterBtn.textContent = state.onlyWrongPool ? "Tất cả từ" : "Từ cần ôn";
+      const onlyWrongButton = document.getElementById("onlyWrongBtn");
+      if (onlyWrongButton) {
+        onlyWrongButton.textContent = state.onlyWrongPool ? "Đang ôn từ cần ôn" : "Ôn từ cần ôn";
+        onlyWrongButton.classList.toggle("btn-review-active", state.onlyWrongPool);
+      }
 
       const vocabTitleEl = document.getElementById("vocabSectionTitle");
       if (vocabTitleEl) {
@@ -4884,6 +5090,7 @@
       }
     });
     document.getElementById("resetBtn").addEventListener("click", () => resetQuiz());
+    document.getElementById("clearReviewBtn").addEventListener("click", () => clearCurrentLessonReview());
     document.getElementById("settingsToggleBtn").addEventListener("click", () => toggleSettingsPanel());
     document.getElementById("shuffleBtn").addEventListener("click", () => {
       state.quizOrder = shuffleArray(state.quizOrder);
@@ -4945,6 +5152,14 @@
       state.onlyFavorites = !state.onlyFavorites;
       renderWords();
       renderPanels();
+    });
+    document.getElementById("toggleReviewFilterBtn").addEventListener("click", () => {
+      state.onlyWrongPool = !state.onlyWrongPool;
+      if (state.appSection === "study") resetQuiz();
+      else {
+        renderWords();
+        renderPanels();
+      }
     });
     document.querySelectorAll("#modeTabs button").forEach(btn => {
       btn.addEventListener("click", () => {
