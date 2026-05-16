@@ -2999,6 +2999,9 @@
       onlyWrongPool: false,
       wrongWords: [],
       reviewWords: [],
+      sessionRemovedKeys: [],
+      sessionDisplayIndex: 0,
+      sessionTotal: 0,
       favorites: [],
       subjects: JSON.parse(JSON.stringify(defaultSubjects)),
       activeSubjectIndex: 0,
@@ -3092,6 +3095,79 @@
       return state.quizOrder[state.currentIndex] || null;
     }
 
+    function ensureSessionRemovedKeys() {
+      if (!Array.isArray(state.sessionRemovedKeys)) state.sessionRemovedKeys = [];
+    }
+
+    function markSessionRemoved(word) {
+      const key = wordKey(word);
+      if (!key) return;
+      ensureSessionRemovedKeys();
+      if (!state.sessionRemovedKeys.includes(key)) state.sessionRemovedKeys.push(key);
+    }
+
+    function unmarkSessionRemoved(word) {
+      const key = wordKey(word);
+      if (!key) return;
+      ensureSessionRemovedKeys();
+      state.sessionRemovedKeys = state.sessionRemovedKeys.filter(item => item !== key);
+    }
+
+    function isSessionRemoved(word) {
+      const key = wordKey(word);
+      ensureSessionRemovedKeys();
+      return !!key && state.sessionRemovedKeys.includes(key);
+    }
+
+    function isCardAvailableForCurrentSession(word) {
+      if (!word || !wordKey(word)) return false;
+      if (isSessionRemoved(word)) return false;
+      if (state.onlyWrongPool && !isNeedsReviewWord(word)) return false;
+      return true;
+    }
+
+    function ensureSessionCounter() {
+      if (!Number.isFinite(Number(state.sessionDisplayIndex))) {
+        state.sessionDisplayIndex = Number.isFinite(Number(state.currentIndex)) ? Number(state.currentIndex) : 0;
+      }
+      if (!Number.isFinite(Number(state.sessionTotal)) || Number(state.sessionTotal) <= 0) {
+        state.sessionTotal = Array.isArray(state.quizOrder) && state.quizOrder.length
+          ? state.quizOrder.length
+          : Math.max(getStudyPool().length, getWords().length, 1);
+      }
+    }
+
+    function moveSessionCounter(step) {
+      ensureSessionCounter();
+      const total = Math.max(Number(state.sessionTotal) || 1, 1);
+      const current = Math.max(0, Math.min(Number(state.sessionDisplayIndex) || 0, total - 1));
+      state.sessionDisplayIndex = Math.max(0, Math.min(current + step, total - 1));
+    }
+
+    function setSessionCounterFromCurrentIndex() {
+      ensureSessionCounter();
+      const total = Math.max(Number(state.sessionTotal) || 1, 1);
+      state.sessionDisplayIndex = Math.max(0, Math.min(Number(state.currentIndex) || 0, total - 1));
+    }
+
+    function getFlashcardCounterText() {
+      ensureSessionCounter();
+      const total = Math.max(Number(state.sessionTotal) || state.quizOrder.length || 1, 1);
+      const current = Math.max(0, Math.min(Number(state.sessionDisplayIndex) || 0, total - 1));
+      return `${current + 1} / ${total} thẻ`;
+    }
+
+    function findAvailableCardIndex(startIndex = 0, direction = 1) {
+      const total = state.quizOrder.length;
+      if (!total) return -1;
+      const step = direction < 0 ? -1 : 1;
+      for (let offset = 0; offset < total; offset += 1) {
+        const index = (startIndex + (offset * step) + total) % total;
+        if (isCardAvailableForCurrentSession(state.quizOrder[index])) return index;
+      }
+      return -1;
+    }
+
 
     function wordKey(wordOrVocab) {
       const raw = typeof wordOrVocab === "string" ? wordOrVocab : wordOrVocab?.vocab;
@@ -3159,7 +3235,7 @@
 
       // Khi đang học danh sách cần ôn, nếu bỏ đánh dấu thì loại ngay khỏi hàng đợi.
       // Nếu chỉ đánh dấu thêm, tự nhảy sang từ kế tiếp để không bị đứng ở cùng một từ.
-      advanceAfterReviewAction(word, { removeFromQueue: state.onlyWrongPool && wasManualReview });
+      advanceAfterReviewAction(word, { removeFromQueue: false, skipThisTurn: true });
     }
 
     function markWordMastered(word = getCurrent()) {
@@ -3169,7 +3245,7 @@
       saveState();
 
       // Xóa mọi bản sao của từ này trong lượt học hiện tại, kể cả bản được chèn do trả lời sai.
-      advanceAfterReviewAction(word, { removeFromQueue: true });
+      advanceAfterReviewAction(word, { removeFromQueue: false, skipThisTurn: true });
     }
 
     function clearCurrentLessonReview() {
@@ -4166,6 +4242,9 @@
     function resetQuiz() {
       const source = buildQuizSource();
       state.quizOrder = shuffleArray(source);
+      state.sessionRemovedKeys = [];
+      state.sessionTotal = Math.max(state.quizOrder.length, 0);
+      state.sessionDisplayIndex = 0;
       state.currentIndex = 0;
       state.answer = "";
       state.selectedChoice = "";
@@ -4210,25 +4289,33 @@
     }
 
     function advanceAfterReviewAction(word, options = {}) {
-      const { removeFromQueue = false } = options;
-      if (removeFromQueue) {
-        removeWordFromCurrentQueue(word);
-      } else if (state.quizOrder.length) {
-        state.currentIndex = Math.min(state.currentIndex + 1, state.quizOrder.length);
-        if (state.currentIndex >= state.quizOrder.length) {
-          const freshSource = buildQuizSource();
-          state.quizOrder = shuffleArray(freshSource);
-          state.currentIndex = 0;
-        }
+      const { removeFromQueue = false, skipThisTurn = true } = options;
+      const oldIndex = state.currentIndex;
+
+      // Khi bấm “Đã thuộc” hoặc “Đánh dấu cần ôn”, từ hiện tại phải được bỏ qua
+      // trong lượt học hiện tại rồi chuyển sang thẻ kế tiếp. Giữ quizOrder giúp số
+      // thứ tự thẻ vẫn nhảy tự nhiên: 1/10 → 2/10 → 3/10.
+      if (skipThisTurn) markSessionRemoved(word);
+      if (removeFromQueue && state.onlyWrongPool) removeWordFromCurrentQueue(word);
+
+      if (!state.quizOrder.length) {
+        state.quizOrder = shuffleArray(buildQuizSource());
+        state.currentIndex = 0;
       }
 
-      if (state.onlyWrongPool) {
-        const current = getCurrent();
-        if (current && !isNeedsReviewWord(current)) removeWordFromCurrentQueue(current);
-        if (!state.quizOrder.length) {
-          state.quizOrder = shuffleArray(buildQuizSource());
-          state.currentIndex = 0;
-        }
+      const nextIndex = findAvailableCardIndex(oldIndex + 1, 1);
+      if (nextIndex >= 0) {
+        state.currentIndex = nextIndex;
+        moveSessionCounter(1);
+      } else {
+        // Hết thẻ khả dụng trong lượt hiện tại: giữ nguyên tổng thẻ để tránh nhảy 1/74,
+        // chỉ chuyển về thẻ khả dụng đầu tiên cho lượt mới khi cần.
+        state.quizOrder = shuffleArray(buildQuizSource());
+        state.sessionRemovedKeys = [];
+        state.sessionTotal = Math.max(state.quizOrder.length, state.sessionTotal || 0);
+        state.sessionDisplayIndex = 0;
+        state.currentIndex = findAvailableCardIndex(0, 1);
+        if (state.currentIndex < 0) state.currentIndex = 0;
       }
 
       refreshCurrentOptionsAndRender();
@@ -4353,7 +4440,20 @@
         state.quizOrder = shuffleArray(buildQuizSource());
       }
       const total = state.quizOrder.length;
-      state.currentIndex = total ? (targetIndex + total) % total : 0;
+      if (!total) {
+        state.currentIndex = 0;
+        render();
+        return;
+      }
+
+      const previousIndex = state.currentIndex;
+      const direction = targetIndex < state.currentIndex ? -1 : 1;
+      const normalized = (targetIndex + total) % total;
+      const availableIndex = findAvailableCardIndex(normalized, direction);
+      state.currentIndex = availableIndex >= 0 ? availableIndex : 0;
+      if (direction > 0 && targetIndex !== previousIndex) moveSessionCounter(1);
+      else if (direction < 0 && targetIndex !== previousIndex) moveSessionCounter(-1);
+      else setSessionCounterFromCurrentIndex();
 
       const current = getCurrent();
       if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
@@ -4794,7 +4894,7 @@
           </div>
           <div class="flashcard-nav">
             <button class="btn btn-outline" onclick="handlePrevious()">← Thẻ trước</button>
-            <div class="flashcard-counter">${state.currentIndex + 1} / ${Math.max(state.quizOrder.length, 1)} thẻ</div>
+            <div class="flashcard-counter">${getFlashcardCounterText()}</div>
             <button class="btn btn-outline" onclick="handleNext()">Thẻ sau →</button>
           </div>
           <div class="flashcard-actions">
