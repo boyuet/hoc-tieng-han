@@ -384,6 +384,16 @@
     .tone-sky { color: #38bdf8; }
     .tone-amber { color: #f59e0b; }
 
+
+    .question-text.is-listen-only {
+      font-family: var(--app-font);
+      font-size: clamp(54px, 8vw, 92px);
+      line-height: 1;
+      letter-spacing: 0;
+      color: #7dd3fc;
+      text-shadow: 0 18px 38px rgba(56,189,248,.18);
+    }
+
     .question-head-actions {
       margin-top: 18px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
@@ -2750,6 +2760,8 @@
             <button data-mode="multiple-vi-ko">Trắc nghiệm đảo</button>
             <button data-mode="typing">Gõ từ</button>
             <button data-mode="listening">Phát âm</button>
+            <button data-mode="listen-type">Nghe + gõ Hàn</button>
+            <button data-mode="listen-choice">Nghe + chọn nghĩa</button>
             <button data-mode="flashcard">Flash card</button>
           </div>
           <div class="tabs hidden" id="playTabs">
@@ -3312,7 +3324,7 @@
     function buildOptionsForCurrent(current) {
       const words = getWords();
       if (!current) return [];
-      if (state.mode === "multiple-ko-vi") {
+      if (state.mode === "multiple-ko-vi" || state.mode === "listen-choice") {
         return shuffleArray([current.meaning, ...uniqueMeanings(words, current.meaning, 3)]);
       }
       if (state.mode === "multiple-vi-ko") {
@@ -3648,7 +3660,7 @@
           state.speechTranscript = transcript;
           const input = document.getElementById('answerInput');
           if (input) input.value = transcript;
-          if (state.mode === 'listening' && transcript) {
+          if ((state.mode === 'listening' || state.mode === 'listen-type') && transcript) {
             setTimeout(() => handleSubmit(), 120);
           } else {
             renderQuestion();
@@ -4300,10 +4312,10 @@
       state.score = 0;
       state.completed = 0;
       hideError();
-      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
+      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice") {
         state.currentOptions = buildOptionsForCurrent(getCurrent());
       }
-      if (state.mode === "listening" && state.quizOrder[0]) {
+      if ((state.mode === "listening" || state.mode === "listen-type" || state.mode === "listen-choice") && state.quizOrder[0]) {
         setTimeout(() => speakKorean(state.quizOrder[0].vocab, Number(state.listeningRate)), 180);
       }
       render();
@@ -4315,10 +4327,10 @@
       state.selectedChoice = "";
       state.feedback = null;
       state.flashcardFlipped = false;
-      state.currentOptions = (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko")
+      state.currentOptions = (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice")
         ? buildOptionsForCurrent(current)
         : [];
-      if (state.mode === "listening" && current) {
+      if ((state.mode === "listening" || state.mode === "listen-type" || state.mode === "listen-choice") && current) {
         setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 160);
       }
       render();
@@ -4446,7 +4458,7 @@
 
     function getOptions(current) {
       if (!current) return [];
-      if (state.mode !== "multiple-ko-vi" && state.mode !== "multiple-vi-ko") return [];
+      if (state.mode !== "multiple-ko-vi" && state.mode !== "multiple-vi-ko" && state.mode !== "listen-choice") return [];
       if (!Array.isArray(state.currentOptions) || !state.currentOptions.length) {
         state.currentOptions = buildOptionsForCurrent(current);
       }
@@ -4458,7 +4470,7 @@
       if (!current || state.feedback) return;
 
       let correct = false;
-      if (state.mode === "multiple-ko-vi") correct = normalizeText(state.selectedChoice) === normalizeText(current.meaning);
+      if (state.mode === "multiple-ko-vi" || state.mode === "listen-choice") correct = normalizeText(state.selectedChoice) === normalizeText(current.meaning);
       else if (state.mode === "multiple-vi-ko") correct = normalizeText(state.selectedChoice) === normalizeText(current.vocab);
       else correct = normalizeText(state.answer) === normalizeText(current.vocab);
 
@@ -4471,7 +4483,7 @@
       }
       playFeedbackSound(correct);
       render();
-      if ((state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") && current?.vocab) {
+      if ((state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice") && current?.vocab) {
         setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 120);
       }
     }
@@ -4503,7 +4515,7 @@
       else setSessionCounterFromCurrentIndex();
 
       const current = getCurrent();
-      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
+      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice") {
         state.currentOptions = buildOptionsForCurrent(current);
       } else {
         state.currentOptions = [];
@@ -4788,6 +4800,8 @@
         "multiple-vi-ko": "Trắc nghiệm đảo",
         typing: "Gõ từ",
         listening: "Phát âm",
+        "listen-type": "Nghe + gõ Hàn",
+        "listen-choice": "Nghe + chọn nghĩa",
         flashcard: "Flash card",
       };
       if (state.appSection === "play") {
@@ -4880,6 +4894,7 @@
       if (state.mode === "multiple-ko-vi") title = current.vocab;
       else if (state.mode === "multiple-vi-ko") title = current.meaning;
       else if (state.mode === "typing") title = current.meaning;
+      else if (state.mode === "listen-type" || state.mode === "listen-choice") title = "🎧";
       else if (state.mode === "flashcard") title = current.vocab;
       else title = current.meaning;
 
@@ -4887,6 +4902,8 @@
       if (state.mode === "multiple-ko-vi") label = "Chọn nghĩa tiếng Việt đúng cho từ tiếng Hàn";
       else if (state.mode === "multiple-vi-ko") label = "Chọn từ tiếng Hàn đúng cho nghĩa tiếng Việt";
       else if (state.mode === "typing") label = "Nhập từ tiếng Hàn tương ứng với nghĩa";
+      else if (state.mode === "listen-type") label = "Nghe tiếng Hàn rồi viết lại đáp án bằng tiếng Hàn";
+      else if (state.mode === "listen-choice") label = "Nghe tiếng Hàn rồi chọn nghĩa tiếng Việt đúng";
       else if (state.mode === "flashcard") label = "Flash card từ vựng";
       else label = "Nghe và nhập từ";
 
@@ -4895,7 +4912,7 @@
         <div class="card question-card${state.mode === "flashcard" ? " flashcard-mode" : ""}">
           ${compactHeader ? `` : `<div class="question-meta">${escapeHtml(getActiveSubject()?.name || "Môn học")} • ${escapeHtml(lesson.name)}</div>
           <div class="question-label">${label}</div>
-          <div class="question-text ${questionToneClass()} ${state.mode === "multiple-vi-ko" ? "is-reverse" : ""} ${state.mode === "typing" ? "is-typing" : ""}">${escapeHtml(title)}</div>`}
+          <div class="question-text ${questionToneClass()} ${state.mode === "multiple-vi-ko" ? "is-reverse" : ""} ${state.mode === "typing" ? "is-typing" : ""} ${(state.mode === "listen-type" || state.mode === "listen-choice") ? "is-listen-only" : ""}">${escapeHtml(title)}</div>`}
 
           <div class="question-head-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe lại</button>
@@ -4909,12 +4926,12 @@
           </div>
       `;
 
-      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko") {
+      if (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice") {
         const options = state.currentOptions.length ? state.currentOptions : (state.currentOptions = buildOptionsForCurrent(current));
         const labels = ["A", "B", "C", "D"];
         html += `<div class="choice-grid">`;
         options.forEach((choice, index) => {
-          const expected = state.mode === "multiple-ko-vi" ? current.meaning : current.vocab;
+          const expected = (state.mode === "multiple-ko-vi" || state.mode === "listen-choice") ? current.meaning : current.vocab;
           const active = normalizeText(state.selectedChoice) === normalizeText(choice);
           const revealCorrect = state.feedback && normalizeText(choice) === normalizeText(expected);
           const revealWrong = state.feedback && active && !revealCorrect;
@@ -4956,7 +4973,7 @@
         html += `
           <div class="input-row">
             <input id="answerInput" class="text-input" type="text" value="${escapeHtml(state.answer)}" placeholder="Nhập từ tiếng Hàn..." oninput="updateAnswer(this.value)" autofocus />
-            ${state.mode === "listening" ? `<button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊</button>` : ``}
+            ${(state.mode === "listening" || state.mode === "listen-type") ? `<button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊</button>` : ``}
             <button class="btn btn-outline mic-btn ${state.speechListening ? "listening" : ""}" onclick="toggleSpeechInput()" aria-label="Bật nhập giọng nói">${state.speechListening ? "●" : "🎤"}</button>
           </div>
           <div id="speechStatus" class="speech-status ${state.speechListening ? "active" : ""}">${escapeHtml(state.speechTranscript || "")}</div>
@@ -4968,7 +4985,7 @@
           <div class="feedback ${state.feedback.correct ? "correct" : "wrong"}">
             <div style="font-weight:800; margin-bottom:8px;">${state.feedback.correct ? "✅ Chính xác" : "❌ Chưa đúng"}</div>
             <div style="font-size:14px; line-height:1.7; color:#e5eefc;">
-              ${state.mode === "multiple-ko-vi"
+              ${(state.mode === "multiple-ko-vi" || state.mode === "listen-choice")
                 ? `Từ <b>${escapeHtml(current.vocab)}</b> có nghĩa là <b>${escapeHtml(current.meaning)}</b>.`
                 : state.mode === "multiple-vi-ko"
                 ? `Nghĩa <b>${escapeHtml(current.meaning)}</b> tương ứng với từ <b>${escapeHtml(current.vocab)}</b>.`
@@ -4987,7 +5004,7 @@
       area.innerHTML = html;
       if (
         state.appSection === "study" &&
-        (state.mode === "typing" || state.mode === "listening") &&
+        (state.mode === "typing" || state.mode === "listening" || state.mode === "listen-type") &&
         !state.feedback
       ) {
         requestAnimationFrame(() => {
@@ -5408,7 +5425,7 @@
       const activeTag = active?.tagName;
       const isTypingField = activeTag === "INPUT" || activeTag === "TEXTAREA";
       const isAnswerInput = active?.id === "answerInput";
-      const isChoiceMode = state.appSection === "study" && (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko");
+      const isChoiceMode = state.appSection === "study" && (state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice");
       const isFlashcardMode = state.appSection === "study" && state.mode === "flashcard";
       const isPlayMode = state.appSection === "play";
 
