@@ -4223,6 +4223,71 @@ body {
     }
   }
 
+
+
+    /* ===== v18: big folder / subfolder hierarchy ===== */
+    .group-card {
+      border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--border) 72%);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--panel) 94%, white 6%), color-mix(in srgb, var(--panel) 90%, black 10%));
+      border-radius: 24px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.16);
+    }
+    .group-card.active {
+      border-color: color-mix(in srgb, var(--primary) 62%, var(--border) 38%);
+      box-shadow: 0 18px 36px rgba(0,0,0,.2), 0 0 0 1px rgba(125,211,252,.10);
+    }
+    .group-header {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .group-main { min-width: 0; cursor: pointer; }
+    .group-title { display:flex; align-items:center; gap:10px; min-width:0; margin:0; }
+    .group-icon {
+      width: 38px; height: 38px; border-radius: 14px;
+      display:inline-flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, rgba(56,189,248,.18), rgba(167,139,250,.18));
+      border: 1px solid rgba(255,255,255,.08);
+      flex: 0 0 auto;
+    }
+    .group-name { font-size: 18px; font-weight: 900; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-.02em; }
+    .group-meta { margin-top: 4px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .group-actions { display:flex; gap:8px; align-items:center; justify-content:flex-end; }
+    .group-quick-actions { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; margin-bottom: 10px; }
+    .group-mini-btn {
+      min-height: 38px; border-radius: 13px; padding: 8px 10px;
+      background: color-mix(in srgb, var(--panel) 88%, black 12%);
+      border: 1px solid var(--border); color: var(--text); font-size: 12px; font-weight: 800;
+    }
+    .group-mini-btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:#07101f; border-color:transparent; }
+    .subject-list-in-group { display:grid; gap:10px; }
+    .group-card .subject-card { margin-bottom:0; border-radius:20px; }
+    .group-card .subject-card { margin-left: 10px; }
+    .empty-group-hint { padding: 12px; border: 1px dashed var(--border); border-radius: 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    @media (max-width: 720px) {
+      .group-header { grid-template-columns: 1fr; }
+      .group-actions { justify-content:flex-start; }
+      .group-quick-actions { grid-template-columns: 1fr; }
+      .group-card .subject-card { margin-left: 0; }
+    }
+
+
+
+    /* ===== v19: clipboard tools for folder manager ===== */
+    .clipboard-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 10px 12px; margin-bottom: 10px; border-radius: 16px;
+      border: 1px dashed color-mix(in srgb, var(--primary) 48%, var(--border) 52%);
+      background: color-mix(in srgb, var(--panel) 82%, var(--primary) 18%);
+      color: var(--text); font-size: 12px; font-weight: 800; line-height: 1.35;
+    }
+    .clipboard-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+    .clipboard-actions .btn { min-height: 34px; padding: 7px 10px; border-radius: 11px; font-size: 12px; white-space: nowrap; }
+
 </style>
 
 
@@ -4556,17 +4621,18 @@ body {
     <aside class="sidebar card">
       <div class="sidebar-top sidebar-top-compact">
         <div>
-          <h2 class="sidebar-title">Bộ từ vựng</h2>
+          <h2 class="sidebar-title">Vocabulary Studio</h2>
         </div>
       </div>
 
       <div class="unit-panel">
         <div class="unit-panel-head">
-          <div class="unit-heading">Thư mục &amp; bài từ vựng</div>
+          <div class="unit-heading">Library</div>
           <div class="stack-actions">
-            <button class="btn btn-outline" id="createSubjectBtn">＋ Tạo thư mục</button>
-            <button class="btn btn-outline" id="createLessonBtn">＋ Tạo bài</button>
-            <label for="excelFile" class="btn btn-primary">⬆️ Nhập Excel vào thư mục đang chọn</label>
+            <button class="btn btn-outline" id="createGroupBtn">＋ Main</button>
+            <button class="btn btn-outline" id="createSubjectBtn">＋ Folder</button>
+            <button class="btn btn-outline" id="createLessonBtn">＋ Lesson</button>
+            <label for="excelFile" class="btn btn-primary">⬆️ Excel</label>
           </div>
         </div>
         <div class="unit-list" id="unitList"></div>
@@ -4736,7 +4802,7 @@ body {
           </div>
           <div class="quick-add-actions">
             <div class="quick-add-note">Enter để lưu nhanh khi đang ở ô nghĩa.</div>
-            <button class="btn btn-outline" id="importLessonExcelBtn" type="button">⬆️ Nhập Excel vào bài này</button>
+            <button class="btn btn-outline" id="importLessonExcelBtn" type="button">⬆️ Excel</button>
             <button class="btn btn-outline" id="cancelQuickAddBtn" type="button">Hủy</button>
             <button class="btn btn-primary" id="saveQuickAddBtn" type="button">Lưu từ mới</button>
           </div>
@@ -4845,6 +4911,11 @@ body {
     ];
 
 
+    const defaultGroups = [
+      { id: "group-sample", name: "Beginner 1", sourceFile: "Sample data" }
+    ];
+
+
     function normalizeStoredSubjects(subjects) {
       const fallback = JSON.parse(JSON.stringify(defaultSubjects));
       const rawSubjects = Array.isArray(subjects) && subjects.length ? subjects : fallback;
@@ -4856,6 +4927,7 @@ body {
           id: subject?.id || makeId("subject"),
           name: String(subject?.name || `Môn ${subjectIndex + 1}`),
           sourceFile: String(subject?.sourceFile || "Dữ liệu đã lưu"),
+          groupId: String(subject?.groupId || "group-sample"),
           lessons: lessons.map((lesson, lessonIndex) => ({
             id: lesson?.id || makeId("lesson"),
             name: String(lesson?.name || `Bài ${lessonIndex + 1}`),
@@ -4897,7 +4969,9 @@ body {
       sessionDisplayIndex: 0,
       sessionTotal: 0,
       favorites: [],
+      groups: JSON.parse(JSON.stringify(defaultGroups)),
       subjects: normalizeStoredSubjects(defaultSubjects),
+      activeGroupIndex: 0,
       activeSubjectIndex: 0,
       activeLessonIndex: 0,
       koreanVoice: null,
@@ -4929,8 +5003,11 @@ body {
       inlineEdit: null,
       settingsOpen: false,
       wordFormOpen: false,
+      collapsedGroups: [],
       collapsedSubjects: [],
+      pendingExcelGroupIndex: null,
       pendingExcelSubjectIndex: null,
+      clipboard: null,
       dialog: { open: false, type: "confirm", action: "", payload: null },
       micSupportedChecked: false,
     };
@@ -5002,6 +5079,58 @@ body {
 
     function getActiveLesson() {
       return getActiveSubject()?.lessons?.[state.activeLessonIndex] || null;
+    }
+
+    function getActiveGroup() {
+      return state.groups?.[state.activeGroupIndex] || null;
+    }
+
+    function getDefaultGroupId() {
+      if (!Array.isArray(state.groups) || !state.groups.length) {
+        state.groups = JSON.parse(JSON.stringify(defaultGroups));
+        state.activeGroupIndex = 0;
+      }
+      return state.groups[0].id;
+    }
+
+    function normalizeGroups(savedGroups, subjects = []) {
+      const rawGroups = Array.isArray(savedGroups) && savedGroups.length
+        ? savedGroups
+        : JSON.parse(JSON.stringify(defaultGroups));
+      const groups = rawGroups.map((group, index) => ({
+        id: String(group?.id || makeId("group")),
+        name: String(group?.name || `Thư mục to ${index + 1}`),
+        sourceFile: String(group?.sourceFile || "Tạo thủ công"),
+      }));
+      if (!groups.length) groups.push({ id: makeId("group"), name: "Sơ cấp 1", sourceFile: "Manual" });
+      const validIds = new Set(groups.map(group => group.id));
+      subjects.forEach(subject => {
+        if (!subject.groupId || !validIds.has(subject.groupId)) subject.groupId = groups[0].id;
+      });
+      return groups;
+    }
+
+    function getSubjectsInGroup(groupId) {
+      return state.subjects
+        .map((subject, index) => ({ subject, index }))
+        .filter(item => item.subject.groupId === groupId);
+    }
+
+    function setActiveGroupById(groupId) {
+      const groupIndex = state.groups.findIndex(group => group.id === groupId);
+      if (groupIndex >= 0) state.activeGroupIndex = groupIndex;
+    }
+
+    function ensureActiveSubjectInsideGroup() {
+      const activeGroup = getActiveGroup();
+      if (!activeGroup) return;
+      const activeSubject = getActiveSubject();
+      if (activeSubject?.groupId === activeGroup.id) return;
+      const first = getSubjectsInGroup(activeGroup.id)[0];
+      if (first) {
+        state.activeSubjectIndex = first.index;
+        state.activeLessonIndex = 0;
+      }
     }
 
     function getWords() {
@@ -5660,7 +5789,10 @@ body {
         displayFontName: state.displayFontName,
         listeningRate: state.listeningRate,
         selectedVoiceURI: state.selectedVoiceURI,
+        groups: state.groups,
         subjects: state.subjects,
+        activeGroupIndex: state.activeGroupIndex,
+        collapsedGroups: state.collapsedGroups,
         favorites: state.favorites,
         wrongWords: state.wrongWords,
         reviewWords: state.reviewWords,
@@ -5689,6 +5821,11 @@ body {
       if (saved.listeningRate) state.listeningRate = String(saved.listeningRate);
       if (saved.selectedVoiceURI) state.selectedVoiceURI = String(saved.selectedVoiceURI);
       state.subjects = migrateLegacyData(saved);
+      state.groups = normalizeGroups(saved.groups, state.subjects);
+      state.activeGroupIndex = 0;
+      if (Number.isInteger(saved.activeGroupIndex) && saved.activeGroupIndex >= 0 && saved.activeGroupIndex < state.groups.length) {
+        state.activeGroupIndex = saved.activeGroupIndex;
+      }
       if (Array.isArray(saved.favorites)) state.favorites = saved.favorites;
       else state.favorites = [];
       if (Array.isArray(saved.wrongWords)) state.wrongWords = saved.wrongWords;
@@ -5703,7 +5840,10 @@ body {
       if (saved.appSection === "view") state.appSection = "vocab";
       else if (saved.appSection) state.appSection = saved.appSection;
       if (saved.playMode) state.playMode = saved.playMode;
+      state.collapsedGroups = Array.isArray(saved.collapsedGroups) ? saved.collapsedGroups : [];
       state.collapsedSubjects = Array.isArray(saved.collapsedSubjects) ? saved.collapsedSubjects : [];
+      const activeSubject = getActiveSubject();
+      if (activeSubject?.groupId) setActiveGroupById(activeSubject.groupId);
       const lessons = getActiveSubject()?.lessons || [];
       state.activeLessonIndex = 0;
       if (Number.isInteger(saved.activeLessonIndex) && saved.activeLessonIndex >= 0 && saved.activeLessonIndex < lessons.length) {
@@ -5860,18 +6000,263 @@ body {
       box.classList.remove("show");
     }
 
+
+    function deepClonePlain(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function cloneLessonForPaste(lesson, appendCopy = true) {
+      const cloned = deepClonePlain(lesson || {});
+      cloned.id = makeId("lesson");
+      cloned.name = `${cloned.name || "Lesson"}${appendCopy ? " Copy" : ""}`;
+      cloned.sourceFile = cloned.sourceFile || "Copied";
+      cloned.words = (Array.isArray(cloned.words) ? cloned.words : []).map(word => ({ ...word, id: makeId("word") }));
+      return cloned;
+    }
+
+    function cloneSubjectForPaste(subject, targetGroupId, appendCopy = true) {
+      const cloned = deepClonePlain(subject || {});
+      cloned.id = makeId("subject");
+      cloned.groupId = targetGroupId;
+      cloned.name = `${cloned.name || "Subfolder"}${appendCopy ? " Copy" : ""}`;
+      cloned.sourceFile = cloned.sourceFile || "Copied";
+      cloned.lessons = (Array.isArray(cloned.lessons) ? cloned.lessons : []).map(lesson => cloneLessonForPaste(lesson, false));
+      return cloned;
+    }
+
+    function cloneGroupForPaste(groupData, appendCopy = true) {
+      const group = deepClonePlain(groupData?.group || {});
+      group.id = makeId("group");
+      group.name = `${group.name || "Main Folder"}${appendCopy ? " Copy" : ""}`;
+      group.sourceFile = group.sourceFile || "Copied";
+      const subjects = (Array.isArray(groupData?.subjects) ? groupData.subjects : []).map(subject => cloneSubjectForPaste(subject, group.id, false));
+      return { group, subjects };
+    }
+
+    function setClipboard(kind, mode, payload = {}) {
+      state.clipboard = { kind, mode, label: payload.label || kind, data: payload.data || null, source: payload.source || null };
+      if (typeof closeOtherMoreMenus === "function") closeOtherMoreMenus(null);
+      renderTopicList();
+    }
+
+    function clearClipboard() { state.clipboard = null; renderTopicList(); }
+
+    function copyGroup(groupIndex, mode = "copy") {
+      const group = state.groups[groupIndex];
+      if (!group) return;
+      const subjects = getSubjectsInGroup(group.id).map(item => state.subjects[item.index]);
+      setClipboard("group", mode, { label: group.name, data: { group: deepClonePlain(group), subjects: deepClonePlain(subjects) }, source: { groupId: group.id } });
+    }
+
+    function copySubject(subjectIndex, mode = "copy") {
+      const subject = state.subjects[subjectIndex];
+      if (!subject) return;
+      setClipboard("subject", mode, { label: subject.name, data: deepClonePlain(subject), source: { subjectId: subject.id } });
+    }
+
+    function copyLesson(subjectIndex, lessonIndex, mode = "copy") {
+      const subject = state.subjects[subjectIndex];
+      const lesson = subject?.lessons?.[lessonIndex];
+      if (!lesson) return;
+      setClipboard("lesson", mode, { label: lesson.name, data: deepClonePlain(lesson), source: { subjectId: subject.id, lessonId: lesson.id } });
+    }
+
+    function pasteClipboardToRoot() {
+      const clip = state.clipboard;
+      if (!clip || clip.kind !== "group") return;
+      if (clip.mode === "cut") {
+        const sourceIndex = state.groups.findIndex(group => group.id === clip.source?.groupId);
+        if (sourceIndex >= 0) {
+          const [group] = state.groups.splice(sourceIndex, 1);
+          state.groups.push(group);
+          state.activeGroupIndex = state.groups.length - 1;
+          ensureActiveSubjectInsideGroup();
+          state.clipboard = null;
+          saveState();
+          render();
+          return;
+        }
+      }
+      const cloned = cloneGroupForPaste(clip.data, true);
+      state.groups.push(cloned.group);
+      state.subjects.push(...cloned.subjects);
+      state.activeGroupIndex = state.groups.length - 1;
+      ensureActiveSubjectInsideGroup();
+      if (clip.mode === "cut") state.clipboard = null;
+      saveState();
+      render();
+    }
+
+    function pasteClipboardToGroup(groupIndex) {
+      const clip = state.clipboard;
+      const group = state.groups[groupIndex];
+      if (!clip || !group || clip.kind !== "subject") return;
+      if (clip.mode === "cut") {
+        const sourceIndex = state.subjects.findIndex(subject => subject.id === clip.source?.subjectId);
+        if (sourceIndex >= 0) {
+          state.subjects[sourceIndex].groupId = group.id;
+          state.activeSubjectIndex = sourceIndex;
+          state.activeGroupIndex = groupIndex;
+          state.clipboard = null;
+          saveState();
+          resetQuiz();
+          return;
+        }
+      }
+      const pasted = cloneSubjectForPaste(clip.data, group.id, true);
+      state.subjects.push(pasted);
+      state.activeGroupIndex = groupIndex;
+      state.activeSubjectIndex = state.subjects.length - 1;
+      state.activeLessonIndex = 0;
+      if (clip.mode === "cut") state.clipboard = null;
+      saveState();
+      resetQuiz();
+    }
+
+    function pasteClipboardToSubject(subjectIndex) {
+      const clip = state.clipboard;
+      const subject = state.subjects[subjectIndex];
+      if (!clip || !subject || clip.kind !== "lesson") return;
+      if (!Array.isArray(subject.lessons)) subject.lessons = [];
+      if (clip.mode === "cut") {
+        const sourceSubjectIndex = state.subjects.findIndex(item => item.id === clip.source?.subjectId);
+        const sourceSubject = state.subjects[sourceSubjectIndex];
+        const lessonIndex = sourceSubject?.lessons?.findIndex(item => item.id === clip.source?.lessonId) ?? -1;
+        if (sourceSubject && lessonIndex >= 0) {
+          const [lesson] = sourceSubject.lessons.splice(lessonIndex, 1);
+          subject.lessons.push(lesson);
+          state.activeSubjectIndex = subjectIndex;
+          if (subject.groupId) setActiveGroupById(subject.groupId);
+          state.activeLessonIndex = subject.lessons.length - 1;
+          state.clipboard = null;
+          saveState();
+          resetQuiz();
+          return;
+        }
+      }
+      subject.lessons.push(cloneLessonForPaste(clip.data, true));
+      state.activeSubjectIndex = subjectIndex;
+      if (subject.groupId) setActiveGroupById(subject.groupId);
+      state.activeLessonIndex = subject.lessons.length - 1;
+      if (clip.mode === "cut") state.clipboard = null;
+      saveState();
+      resetQuiz();
+    }
+
+    function clipboardSummaryHtml() {
+      const clip = state.clipboard;
+      if (!clip) return "";
+      const action = clip.mode === "cut" ? "Cut" : "Copy";
+      const kindLabel = clip.kind === "group" ? "Main" : clip.kind === "subject" ? "Folder" : "Lesson";
+      const pasteButton = clip.kind === "group" ? `<button type="button" class="btn btn-primary" onclick="pasteClipboardToRoot()">Paste</button>` : "";
+      return `<div class="clipboard-bar"><div>📋 ${action} ${kindLabel}: ${escapeHtml(clip.label)}</div><div class="clipboard-actions">${pasteButton}<button type="button" class="btn btn-outline" onclick="clearClipboard()">Clear</button></div></div>`;
+    }
+
+    function isGroupCollapsed(group) {
+      return !!group && Array.isArray(state.collapsedGroups) && state.collapsedGroups.includes(group.id);
+    }
+
+    function toggleGroupCollapse(groupIndex, event) {
+      if (event) event.stopPropagation();
+      const group = state.groups[groupIndex];
+      if (!group) return;
+      if (!Array.isArray(state.collapsedGroups)) state.collapsedGroups = [];
+      if (state.collapsedGroups.includes(group.id)) {
+        state.collapsedGroups = state.collapsedGroups.filter(id => id !== group.id);
+      } else {
+        state.collapsedGroups.push(group.id);
+      }
+      saveState();
+      renderTopicList();
+    }
+
+    function createGroup(name) {
+      if (typeof name !== "string") {
+        openActionModal({
+          type: "input",
+          action: "create-group",
+          badge: "Main folder",
+          title: "Create new main folder",
+          description: "Example: Beginner 1, Beginner 2. Each main folder can contain many subfolders and lessons.",
+          label: "Main folder name",
+          placeholder: "Example: Beginner 1",
+          value: `Beginner ${state.groups.length + 1}`,
+          confirmLabel: "Create main folder",
+        });
+        return;
+      }
+      const cleaned = name.trim();
+      if (!cleaned) return;
+      state.groups.push({ id: makeId("group"), name: cleaned, sourceFile: "Manual" });
+      state.activeGroupIndex = state.groups.length - 1;
+      saveState();
+      render();
+    }
+
+    function renameGroup(groupIndex) {
+      startInlineEdit('group', { groupIndex });
+    }
+
+    function deleteGroup(groupIndex, skipConfirm = false) {
+      const group = state.groups[groupIndex];
+      if (!group) return;
+      const subjectCount = getSubjectsInGroup(group.id).length;
+      if (!skipConfirm) {
+        openActionModal({
+          type: "confirm",
+          action: "delete-group",
+          payload: { groupIndex },
+          badge: "Delete",
+          title: `Xóa "${group.name}"?`,
+          description: `This will delete ${subjectCount} subfolders and all lessons/vocabulary inside.`,
+          confirmLabel: "Delete",
+          danger: true,
+        });
+        return;
+      }
+      const removedId = group.id;
+      state.subjects = state.subjects.filter(subject => subject.groupId !== removedId);
+      state.groups.splice(groupIndex, 1);
+      if (!state.groups.length) state.groups = [{ id: makeId("group"), name: "Sơ cấp 1", sourceFile: "Manual" }];
+      if (!state.subjects.length) {
+        state.subjects = [{ id: makeId("subject"), name: "Thư mục con 1", sourceFile: "Manual", groupId: state.groups[0].id, lessons: [{ id: makeId("lesson"), name: "Bài 1", sourceFile: "Manual", words: [] }] }];
+      }
+      state.activeGroupIndex = Math.min(state.activeGroupIndex, state.groups.length - 1);
+      ensureActiveSubjectInsideGroup();
+      if (!getActiveSubject()) state.activeSubjectIndex = 0;
+      state.activeLessonIndex = 0;
+      saveState();
+      resetQuiz();
+    }
+
+    function createSubjectInGroup(groupIndex) {
+      if (state.groups[groupIndex]) state.activeGroupIndex = groupIndex;
+      createSubject();
+    }
+
+    function importExcelToGroup(groupIndex) {
+      const group = state.groups[groupIndex];
+      if (!group) return;
+      state.activeGroupIndex = groupIndex;
+      state.pendingExcelGroupIndex = groupIndex;
+      state.pendingExcelSubjectIndex = null;
+      saveState();
+      render();
+      document.getElementById("excelFile")?.click();
+    }
+
     function createSubject(name) {
       if (typeof name !== "string") {
         openActionModal({
           type: "input",
           action: "create-subject",
-          badge: "Thư mục",
-          title: "Tạo thư mục mới",
-          description: "Đặt tên rõ ràng để quản lý bài học chuyên nghiệp hơn.",
-          label: "Tên thư mục",
-          placeholder: "Ví dụ: KOREAN",
-          value: "Thư mục mới",
-          confirmLabel: "Tạo thư mục",
+          badge: "Subfolder",
+          title: "Create new subfolder",
+          description: `Thư mục con này sẽ nằm trong "${getActiveGroup()?.name || "Thư mục to"}".`,
+          label: "Subfolder name",
+          placeholder: "Example: Textbook / Colors",
+          value: "New subfolder",
+          confirmLabel: "Create subfolder",
         });
         return;
       }
@@ -5880,10 +6265,12 @@ body {
       state.subjects.push({
         id: makeId("subject"),
         name: cleaned,
-        sourceFile: "Tạo thủ công",
+        sourceFile: "Manual",
+        groupId: getActiveGroup()?.id || getDefaultGroupId(),
         lessons: [],
       });
       state.activeSubjectIndex = state.subjects.length - 1;
+      setActiveGroupById(state.subjects[state.activeSubjectIndex].groupId);
       state.activeLessonIndex = 0;
       saveState();
       resetQuiz();
@@ -5891,21 +6278,22 @@ body {
 
     function createLesson(name) {
       const subject = getActiveSubject();
-      if (!subject) {
-        showError("Hãy tạo thư mục trước rồi mới thêm bài.");
+      const activeGroup = getActiveGroup();
+      if (!subject || (activeGroup && subject.groupId !== activeGroup.id)) {
+        showError("Please create or select a subfolder in the current main folder before adding a lesson.");
         return;
       }
       if (typeof name !== "string") {
         openActionModal({
           type: "input",
           action: "create-lesson",
-          badge: "Bài học",
-          title: "Tạo bài từ vựng mới",
+          badge: "Lesson",
+          title: "Create new lesson",
           description: `Bài này sẽ được thêm vào thư mục "${subject.name}".`,
-          label: "Tên bài",
-          placeholder: "Ví dụ: Bài 1",
-          value: `Bài ${subject.lessons.length + 1}`,
-          confirmLabel: "Tạo bài",
+          label: "Lesson name",
+          placeholder: "Example: Lesson 1",
+          value: `Lesson ${subject.lessons.length + 1}`,
+          confirmLabel: "Create lesson",
         });
         return;
       }
@@ -5914,7 +6302,7 @@ body {
       subject.lessons.push({
         id: makeId("lesson"),
         name: cleaned,
-        sourceFile: "Tạo thủ công",
+        sourceFile: "Manual",
         words: [],
       });
       state.activeLessonIndex = subject.lessons.length - 1;
@@ -5939,7 +6327,12 @@ body {
     function saveInlineEdit() {
       const edit = state.inlineEdit;
       if (!edit) return;
-      if (edit.kind === 'subject') {
+      if (edit.kind === 'group') {
+        const group = state.groups[edit.groupIndex];
+        if (!group) return;
+        const name = document.getElementById('inlineGroupName')?.value?.trim();
+        if (name) group.name = name;
+      } else if (edit.kind === 'subject') {
         const subject = state.subjects[edit.subjectIndex];
         if (!subject) return;
         const name = document.getElementById('inlineSubjectName')?.value?.trim();
@@ -5979,16 +6372,16 @@ body {
           type: "confirm",
           action: "delete-subject",
           payload: { index },
-          badge: "Xóa thư mục",
+          badge: "Delete",
           title: `Xóa "${subject.name}"?`,
-          description: "Toàn bộ bài và từ vựng bên trong sẽ bị xóa khỏi bộ dữ liệu hiện tại.",
-          confirmLabel: "Xóa thư mục",
+          description: "All lessons and vocabulary inside will be deleted from the current data.",
+          confirmLabel: "Delete",
           danger: true,
         });
         return;
       }
       state.subjects.splice(index, 1);
-      if (!state.subjects.length) state.subjects = JSON.parse(JSON.stringify(defaultSubjects));
+      if (!state.subjects.length) state.subjects = [{ id: makeId("subject"), name: "Thư mục con 1", sourceFile: "Manual", groupId: getActiveGroup()?.id || getDefaultGroupId(), lessons: [{ id: makeId("lesson"), name: "Bài 1", sourceFile: "Manual", words: [] }] }];
       state.activeSubjectIndex = Math.min(state.activeSubjectIndex, state.subjects.length - 1);
       state.activeLessonIndex = 0;
       saveState();
@@ -6008,17 +6401,17 @@ body {
           type: "confirm",
           action: "delete-lesson",
           payload: { subjectIndex, lessonIndex },
-          badge: "Xóa bài học",
+          badge: "Delete",
           title: `Xóa bài "${lesson.name}"?`,
-          description: "Thao tác này sẽ xóa toàn bộ từ vựng thuộc bài hiện tại.",
-          confirmLabel: "Xóa bài",
+          description: "This will delete all vocabulary in this lesson.",
+          confirmLabel: "Delete",
           danger: true,
         });
         return;
       }
       subject.lessons.splice(lessonIndex, 1);
       if (!subject.lessons.length) {
-        subject.lessons.push({ id: makeId("lesson"), name: "Bài 1", sourceFile: "Tạo thủ công", words: [] });
+        subject.lessons.push({ id: makeId("lesson"), name: "Bài 1", sourceFile: "Manual", words: [] });
       }
       if (state.activeSubjectIndex === subjectIndex) {
         state.activeLessonIndex = Math.min(state.activeLessonIndex, subject.lessons.length - 1);
@@ -6033,6 +6426,7 @@ body {
       if (!subject || !lesson) return;
       if (!Array.isArray(lesson.words)) lesson.words = [];
       state.activeSubjectIndex = subjectIndex;
+      if (subject.groupId) setActiveGroupById(subject.groupId);
       state.activeLessonIndex = lessonIndex;
       state.sessionRemovedKeys = [];
       saveState();
@@ -6043,6 +6437,7 @@ body {
       const subject = state.subjects[subjectIndex];
       if (!subject) return;
       state.activeSubjectIndex = subjectIndex;
+      if (subject.groupId) setActiveGroupById(subject.groupId);
       state.activeLessonIndex = Math.min(state.activeLessonIndex, Math.max((subject.lessons || []).length - 1, 0));
       state.pendingExcelSubjectIndex = subjectIndex;
       saveState();
@@ -6129,7 +6524,7 @@ body {
       reader.readAsArrayBuffer(file);
     }
 
-    function parseWorkbook(file, targetSubjectIndex = null) {
+    function parseWorkbook(file, targetSubjectIndex = null, targetGroupIndex = null) {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
@@ -6141,11 +6536,27 @@ body {
             state.activeSubjectIndex = state.subjects.length - 1;
           }
 
-          const safeTargetIndex = Number.isInteger(targetSubjectIndex) && state.subjects[targetSubjectIndex]
-            ? targetSubjectIndex
-            : state.activeSubjectIndex;
-          const subject = state.subjects[safeTargetIndex] || getActiveSubject();
+          const pendingGroupIndex = Number.isInteger(targetGroupIndex)
+            ? targetGroupIndex
+            : (Number.isInteger(state.pendingExcelGroupIndex) ? state.pendingExcelGroupIndex : null);
+          let subject = null;
+          if (pendingGroupIndex !== null && state.groups[pendingGroupIndex] && targetSubjectIndex === null) {
+            subject = {
+              id: makeId("subject"),
+              name: file.name.replace(/\.[^.]+$/, "") || `Thư mục con ${state.subjects.length + 1}`,
+              sourceFile: file.name,
+              groupId: state.groups[pendingGroupIndex].id,
+              lessons: [],
+            };
+            state.subjects.push(subject);
+          } else {
+            const safeTargetIndex = Number.isInteger(targetSubjectIndex) && state.subjects[targetSubjectIndex]
+              ? targetSubjectIndex
+              : state.activeSubjectIndex;
+            subject = state.subjects[safeTargetIndex] || getActiveSubject();
+          }
           if (!subject) return;
+          if (!subject.groupId) subject.groupId = getActiveGroup()?.id || getDefaultGroupId();
           if (!Array.isArray(subject.lessons)) subject.lessons = [];
 
           const addedLessons = [];
@@ -6178,7 +6589,9 @@ body {
 
           subject.lessons.push(...addedLessons);
           state.activeSubjectIndex = state.subjects.indexOf(subject);
+          if (subject.groupId) setActiveGroupById(subject.groupId);
           state.activeLessonIndex = subject.lessons.length - addedLessons.length;
+          state.pendingExcelGroupIndex = null;
           state.collapsedSubjects = (state.collapsedSubjects || []).filter(id => id !== subject.id);
           hideError();
           saveState();
@@ -6605,91 +7018,156 @@ body {
       const activeSubject = getActiveSubject();
       const activeLesson = getActiveLesson();
       const edit = state.inlineEdit;
+      if (!Array.isArray(state.groups) || !state.groups.length) {
+        state.groups = normalizeGroups([], state.subjects);
+      }
+      state.subjects.forEach(subject => {
+        if (!subject.groupId) subject.groupId = state.groups[0].id;
+      });
 
-      unitList.innerHTML = state.subjects.map((subject, subjectIndex) => {
-        const isActiveSubject = subjectIndex === state.activeSubjectIndex;
-        const subjectEditing = edit?.kind === 'subject' && edit.subjectIndex === subjectIndex;
-        const isCollapsed = isSubjectCollapsed(subject);
-        const lessonItems = (subject.lessons || []).map((lesson, lessonIndex) => {
-          const isActiveLesson = isActiveSubject && lessonIndex === state.activeLessonIndex;
-          const lessonEditing = edit?.kind === 'lesson' && edit.subjectIndex === subjectIndex && edit.lessonIndex === lessonIndex;
+      const clipboardBar = clipboardSummaryHtml();
+      unitList.innerHTML = clipboardBar + state.groups.map((group, groupIndex) => {
+        const isActiveGroup = groupIndex === state.activeGroupIndex;
+        const groupEditing = edit?.kind === 'group' && edit.groupIndex === groupIndex;
+        const groupCollapsed = isGroupCollapsed(group);
+        const groupSubjects = getSubjectsInGroup(group.id);
+        const totalLessons = groupSubjects.reduce((sum, item) => sum + ((item.subject.lessons || []).length), 0);
+
+        const subjectItems = groupSubjects.map(({ subject, index: subjectIndex }) => {
+          const isActiveSubject = subjectIndex === state.activeSubjectIndex;
+          const subjectEditing = edit?.kind === 'subject' && edit.subjectIndex === subjectIndex;
+          const isCollapsed = isSubjectCollapsed(subject);
+          const lessonItems = (subject.lessons || []).map((lesson, lessonIndex) => {
+            const isActiveLesson = isActiveSubject && lessonIndex === state.activeLessonIndex;
+            const lessonEditing = edit?.kind === 'lesson' && edit.subjectIndex === subjectIndex && edit.lessonIndex === lessonIndex;
+            return `
+              <div class="lesson-row ${isActiveLesson ? "active" : ""}">
+                <div class="lesson-main" onclick="${lessonEditing ? '' : `selectLesson(${subjectIndex}, ${lessonIndex})`}" style="cursor:${lessonEditing ? 'default' : 'pointer'};">
+                  ${lessonEditing ? `
+                    <div class="inline-edit-row compact single-name">
+                      <input id="inlineLessonName" class="text-input" value="${escapeHtml(lesson.name)}" placeholder="Tên bài" />
+                      <div class="inline-edit-actions compact">
+                        <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
+                        <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+                      </div>
+                    </div>` : `
+                    <div class="lesson-title">
+                      <div class="lesson-icon">📘</div>
+                      <div class="lesson-title-text">
+                        <div class="lesson-name">${escapeHtml(lesson.name)}</div>
+                      </div>
+                    </div>`}
+                </div>
+                <div class="lesson-actions">
+                  <details class="more-menu" onclick="event.stopPropagation()">
+                    <summary class="btn icon-btn more-trigger" title="Lesson options">⋯</summary>
+                    <div class="more-popover">
+                      <button type="button" onclick="importExcelToLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">⬆️ Excel</button>
+                      <button type="button" onclick="copyLesson(${subjectIndex}, ${lessonIndex}, 'copy'); this.closest('details')?.removeAttribute('open');">📄 Copy</button>
+                      <button type="button" onclick="copyLesson(${subjectIndex}, ${lessonIndex}, 'cut'); this.closest('details')?.removeAttribute('open');">✂️ Cut</button>
+                      <button type="button" onclick="renameLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">✏️ Rename</button>
+                      <button type="button" class="danger" onclick="deleteLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">🗑️ Delete</button>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            `;
+          }).join("");
+
           return `
-            <div class="lesson-row ${isActiveLesson ? "active" : ""}">
-              <div class="lesson-main" onclick="${lessonEditing ? '' : `selectLesson(${subjectIndex}, ${lessonIndex})`}" style="cursor:${lessonEditing ? 'default' : 'pointer'};">
-                ${lessonEditing ? `
-                  <div class="inline-edit-row compact single-name">
-                    <input id="inlineLessonName" class="text-input" value="${escapeHtml(lesson.name)}" placeholder="Tên bài" />
-                    <div class="inline-edit-actions compact">
-                      <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
-                      <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+            <div class="subject-card ${isActiveSubject ? "active" : ""} ${isCollapsed ? "is-collapsed" : ""}">
+              <div class="subject-header">
+                <div class="subject-main" onclick="${subjectEditing ? '' : `state.activeSubjectIndex=${subjectIndex}; setActiveGroupById(state.subjects[${subjectIndex}].groupId); state.activeLessonIndex=Math.min(state.activeLessonIndex, ((state.subjects[${subjectIndex}].lessons || []).length || 1)-1); saveState(); render();`}" style="cursor:${subjectEditing ? 'default' : 'pointer'};">
+                  ${subjectEditing ? `
+                    <div class="inline-edit-row compact single-name">
+                      <input id="inlineSubjectName" class="text-input" value="${escapeHtml(subject.name)}" placeholder="Subfolder name" />
+                      <div class="inline-edit-actions compact">
+                        <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
+                        <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
+                      </div>
+                    </div>` : `
+                    <div class="subject-title">
+                      <button type="button" class="btn icon-btn collapse-btn" title="${isCollapsed ? 'Show lessons' : 'Hide lessons'}" onclick="toggleSubjectCollapse(${subjectIndex}, event)">${isCollapsed ? '▸' : '▾'}</button>
+                      <div class="subject-icon">📁</div>
+                      <div class="subject-title-text">
+                        <div class="subject-name">${escapeHtml(subject.name)}</div>
+                      </div>
+                    </div>`}
+                </div>
+                <div class="subject-actions">
+                  <details class="more-menu" onclick="event.stopPropagation()">
+                    <summary class="btn icon-btn more-trigger" title="Subfolder options">⋯</summary>
+                    <div class="more-popover">
+                      <button type="button" onclick="state.activeSubjectIndex=${subjectIndex}; setActiveGroupById(state.subjects[${subjectIndex}].groupId); createLesson(); this.closest('details')?.removeAttribute('open');">＋ Lesson trong thư mục con</button>
+                      <button type="button" onclick="importExcelToSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">⬆️ Excel</button>
+                      <button type="button" onclick="copySubject(${subjectIndex}, 'copy'); this.closest('details')?.removeAttribute('open');">📄 Copy</button>
+                      <button type="button" onclick="copySubject(${subjectIndex}, 'cut'); this.closest('details')?.removeAttribute('open');">✂️ Cut</button>
+                      <button type="button" onclick="renameSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">✏️ Rename</button>
+                      <button type="button" onclick="toggleSubjectCollapse(${subjectIndex}, event); this.closest('details')?.removeAttribute('open');">${isCollapsed ? '👁️ Show lessons' : '🙈 Hide lessons'}</button>
+                      <button type="button" class="danger" onclick="deleteSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">🗑️ Delete</button>
                     </div>
-                  </div>` : `
-                  <div class="lesson-title">
-                    <div class="lesson-icon">📘</div>
-                    <div class="lesson-title-text">
-                      <div class="lesson-name">${escapeHtml(lesson.name)}</div>
-                    </div>
-                  </div>`}
+                  </details>
+                </div>
               </div>
-              <div class="lesson-actions">
-                <details class="more-menu" onclick="event.stopPropagation()">
-                  <summary class="btn icon-btn more-trigger" title="Tùy chọn bài">⋯</summary>
-                  <div class="more-popover">
-                    <button type="button" onclick="importExcelToLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">⬆️ Nhập Excel vào bài này</button>
-                    <button type="button" onclick="renameLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">✏️ Đổi tên</button>
-                    <button type="button" class="danger" onclick="deleteLesson(${subjectIndex}, ${lessonIndex}); this.closest('details')?.removeAttribute('open');">🗑️ Xóa bài</button>
-                  </div>
-                </details>
+              <div class="subject-quick-actions">
+                ${state.clipboard?.kind === 'lesson' ? `<button type="button" class="btn subject-mini-btn primary" onclick="event.stopPropagation(); pasteClipboardToSubject(${subjectIndex});">📋 Paste</button>` : ``}
+                <button type="button" class="btn subject-mini-btn" onclick="event.stopPropagation(); state.activeSubjectIndex=${subjectIndex}; setActiveGroupById(state.subjects[${subjectIndex}].groupId); state.activeLessonIndex=Math.min(state.activeLessonIndex, Math.max(((state.subjects[${subjectIndex}].lessons || []).length - 1), 0)); createLesson();">＋ Lesson</button>
+                <button type="button" class="btn subject-mini-btn primary" onclick="event.stopPropagation(); importExcelToSubject(${subjectIndex});">⬆️ Excel to subfolder</button>
               </div>
+              <div class="lesson-list ${isCollapsed ? 'hidden-children' : ''}">${isCollapsed ? `` : (lessonItems || `<div class="empty-group-hint">No lessons yet.</div>`)}</div>
             </div>
           `;
         }).join("");
 
         return `
-          <div class="subject-card ${isActiveSubject ? "active" : ""} ${isCollapsed ? "is-collapsed" : ""}">
-            <div class="subject-header">
-              <div class="subject-main" onclick="${subjectEditing ? '' : `state.activeSubjectIndex=${subjectIndex}; state.activeLessonIndex=Math.min(state.activeLessonIndex, ((state.subjects[${subjectIndex}].lessons || []).length || 1)-1); saveState(); render();`}" style="cursor:${subjectEditing ? 'default' : 'pointer'};">
-                ${subjectEditing ? `
+          <div class="group-card ${isActiveGroup ? "active" : ""}">
+            <div class="group-header">
+              <div class="group-main" onclick="${groupEditing ? '' : `state.activeGroupIndex=${groupIndex}; ensureActiveSubjectInsideGroup(); saveState(); render();`}" style="cursor:${groupEditing ? 'default' : 'pointer'};">
+                ${groupEditing ? `
                   <div class="inline-edit-row compact single-name">
-                    <input id="inlineSubjectName" class="text-input" value="${escapeHtml(subject.name)}" placeholder="Tên folder" />
+                    <input id="inlineGroupName" class="text-input" value="${escapeHtml(group.name)}" placeholder="Main folder name" />
                     <div class="inline-edit-actions compact">
                       <button class="btn btn-primary" onclick="saveInlineEdit()">Lưu</button>
                       <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
                     </div>
                   </div>` : `
-                  <div class="subject-title">
-                    <button type="button" class="btn icon-btn collapse-btn" title="${isCollapsed ? 'Hiện bài trong môn học' : 'Ẩn bài trong môn học'}" onclick="toggleSubjectCollapse(${subjectIndex}, event)">${isCollapsed ? '▸' : '▾'}</button>
-                    <div class="subject-icon">📁</div>
-                    <div class="subject-title-text">
-                      <div class="subject-name">${escapeHtml(subject.name)}</div>
+                  <div class="group-title">
+                    <button type="button" class="btn icon-btn collapse-btn" title="${groupCollapsed ? 'Show subfolders' : 'Hide subfolders'}" onclick="toggleGroupCollapse(${groupIndex}, event)">${groupCollapsed ? '▸' : '▾'}</button>
+                    <div class="group-icon">🗂️</div>
+                    <div style="min-width:0; flex:1;">
+                      <div class="group-name">${escapeHtml(group.name)}</div>
+                      <div class="group-meta">${groupSubjects.length} subfolders • ${totalLessons} lessons</div>
                     </div>
                   </div>`}
               </div>
-              <div class="subject-actions">
+              <div class="group-actions">
                 <details class="more-menu" onclick="event.stopPropagation()">
-                  <summary class="btn icon-btn more-trigger" title="Tùy chọn môn học">⋯</summary>
+                  <summary class="btn icon-btn more-trigger" title="Main folder options">⋯</summary>
                   <div class="more-popover">
-                    <button type="button" onclick="state.activeSubjectIndex=${subjectIndex}; createLesson(); this.closest('details')?.removeAttribute('open');">＋ Tạo bài trong thư mục</button>
-                    <button type="button" onclick="importExcelToSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">⬆️ Nhập Excel vào thư mục này</button>
-                    <button type="button" onclick="renameSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">✏️ Đổi tên</button>
-                    <button type="button" onclick="toggleSubjectCollapse(${subjectIndex}, event); this.closest('details')?.removeAttribute('open');">${isCollapsed ? '👁️ Hiện bài con' : '🙈 Ẩn bài con'}</button>
-                    <button type="button" class="danger" onclick="deleteSubject(${subjectIndex}); this.closest('details')?.removeAttribute('open');">🗑️ Xóa thư mục</button>
+                    ${state.clipboard?.kind === 'subject' ? `<button type="button" onclick="pasteClipboardToGroup(${groupIndex}); this.closest('details')?.removeAttribute('open');">📋 Paste</button>` : ``}
+                    <button type="button" onclick="state.activeGroupIndex=${groupIndex}; createSubject(); this.closest('details')?.removeAttribute('open');">＋ Folder</button>
+                    <button type="button" onclick="importExcelToGroup(${groupIndex}); this.closest('details')?.removeAttribute('open');">⬆️ Excel</button>
+                    <button type="button" onclick="copyGroup(${groupIndex}, 'copy'); this.closest('details')?.removeAttribute('open');">📄 Copy</button>
+                    <button type="button" onclick="copyGroup(${groupIndex}, 'cut'); this.closest('details')?.removeAttribute('open');">✂️ Cut</button>
+                    <button type="button" onclick="renameGroup(${groupIndex}); this.closest('details')?.removeAttribute('open');">✏️ Rename</button>
+                    <button type="button" onclick="toggleGroupCollapse(${groupIndex}, event); this.closest('details')?.removeAttribute('open');">${groupCollapsed ? '👁️ Show subfolders' : '🙈 Hide subfolders'}</button>
+                    <button type="button" class="danger" onclick="deleteGroup(${groupIndex}); this.closest('details')?.removeAttribute('open');">🗑️ Delete</button>
                   </div>
                 </details>
               </div>
             </div>
-            <div class="subject-quick-actions">
-              <button type="button" class="btn subject-mini-btn" onclick="event.stopPropagation(); state.activeSubjectIndex=${subjectIndex}; state.activeLessonIndex=Math.min(state.activeLessonIndex, Math.max(((state.subjects[${subjectIndex}].lessons || []).length - 1), 0)); createLesson();">＋ Tạo bài trong thư mục</button>
-              <button type="button" class="btn subject-mini-btn primary" onclick="event.stopPropagation(); importExcelToSubject(${subjectIndex});">⬆️ Excel vào thư mục</button>
+            <div class="group-quick-actions">
+              ${state.clipboard?.kind === 'subject' ? `<button type="button" class="btn group-mini-btn primary" onclick="event.stopPropagation(); pasteClipboardToGroup(${groupIndex});">📋 Paste</button>` : ``}
+              <button type="button" class="btn group-mini-btn" onclick="event.stopPropagation(); state.activeGroupIndex=${groupIndex}; createSubject();">＋ Folder</button>
+              <button type="button" class="btn group-mini-btn primary" onclick="event.stopPropagation(); importExcelToGroup(${groupIndex});">⬆️ Excel as subfolder</button>
             </div>
-            <div class="lesson-list ${isCollapsed ? 'hidden-children' : ''}">${isCollapsed ? `` : (lessonItems || ``)}</div>
+            <div class="subject-list-in-group ${groupCollapsed ? 'hidden-children' : ''}">${groupCollapsed ? `` : (subjectItems || `<div class="empty-group-hint">No folders yet.</div>`)}</div>
           </div>
         `;
       }).join("");
 
-      document.getElementById("topUnitLabel").textContent = `Tiến độ - ${activeSubject?.name || "Môn học"}`;
+      document.getElementById("topUnitLabel").textContent = `Progress - ${getActiveGroup()?.name || "Main folder"} / ${activeSubject?.name || "Subfolder"}`;
     }
-
 
     function renderStats() {
       const activeLesson = getActiveLesson();
@@ -7242,6 +7720,9 @@ body {
       }
       closeActionModal();
       switch (dialog.action) {
+        case "create-group":
+          createGroup(value);
+          break;
         case "create-subject":
           createSubject(value);
           break;
@@ -7250,6 +7731,9 @@ body {
           break;
         case "delete-subject":
           deleteSubject(dialog.payload?.index, true);
+          break;
+        case "delete-group":
+          deleteGroup(dialog.payload?.groupIndex, true);
           break;
         case "delete-lesson":
           deleteLesson(dialog.payload?.subjectIndex, dialog.payload?.lessonIndex, true);
@@ -7347,11 +7831,14 @@ body {
 
     document.getElementById("excelFile").addEventListener("change", (e) => {
       const files = Array.from(e.target.files || []);
-      const targetSubjectIndex = Number.isInteger(state.pendingExcelSubjectIndex)
-        ? state.pendingExcelSubjectIndex
-        : state.activeSubjectIndex;
-      files.forEach(file => parseWorkbook(file, targetSubjectIndex));
+      const hasPendingGroup = Number.isInteger(state.pendingExcelGroupIndex);
+      const targetSubjectIndex = hasPendingGroup
+        ? null
+        : (Number.isInteger(state.pendingExcelSubjectIndex) ? state.pendingExcelSubjectIndex : state.activeSubjectIndex);
+      const pendingGroupIndex = hasPendingGroup ? state.pendingExcelGroupIndex : null;
+      files.forEach(file => parseWorkbook(file, targetSubjectIndex, pendingGroupIndex));
       state.pendingExcelSubjectIndex = null;
+      state.pendingExcelGroupIndex = null;
       e.target.value = "";
     });
 
@@ -7372,6 +7859,7 @@ body {
     document.getElementById("exportJsonBtn").addEventListener("click", exportJsonBackup);
     document.getElementById("importJsonBtn").addEventListener("click", () => document.getElementById("jsonBackupFile")?.click());
 
+    document.getElementById("createGroupBtn").addEventListener("click", () => createGroup());
     document.getElementById("createSubjectBtn").addEventListener("click", () => createSubject());
     document.getElementById("createLessonBtn").addEventListener("click", () => createLesson());
     document.getElementById("addWordBtn").addEventListener("click", () => state.wordFormOpen ? closeQuickAddPanel(false) : openQuickAddPanel());
@@ -7647,6 +8135,10 @@ body {
       fillAnswerFromLookup,
       openLookupResult,
       selectLesson,
+      createGroup,
+      renameGroup,
+      deleteGroup,
+      toggleGroupCollapse,
       createLesson,
       renameSubject,
       renameLesson,
