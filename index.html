@@ -5003,6 +5003,7 @@ body {
       inlineEdit: null,
       settingsOpen: false,
       wordFormOpen: false,
+      studyModeSnapshots: {},
       collapsedGroups: [],
       collapsedSubjects: [],
       pendingExcelGroupIndex: null,
@@ -5800,6 +5801,8 @@ body {
         activeLessonIndex: state.activeLessonIndex,
         appSection: state.appSection,
         playMode: state.playMode,
+        studyModeSnapshots: state.studyModeSnapshots,
+        mode: state.mode,
         collapsedSubjects: state.collapsedSubjects,
       };
     }
@@ -5840,6 +5843,8 @@ body {
       if (saved.appSection === "view") state.appSection = "vocab";
       else if (saved.appSection) state.appSection = saved.appSection;
       if (saved.playMode) state.playMode = saved.playMode;
+      if (saved.mode) state.mode = saved.mode;
+      state.studyModeSnapshots = saved.studyModeSnapshots && typeof saved.studyModeSnapshots === "object" ? saved.studyModeSnapshots : {};
       state.collapsedGroups = Array.isArray(saved.collapsedGroups) ? saved.collapsedGroups : [];
       state.collapsedSubjects = Array.isArray(saved.collapsedSubjects) ? saved.collapsedSubjects : [];
       const activeSubject = getActiveSubject();
@@ -6718,6 +6723,72 @@ body {
       return source.length ? source : words;
     }
 
+
+    function getStudySnapshotKey(mode = state.mode) {
+      const subject = getActiveSubject();
+      const lesson = getActiveLesson();
+      const subjectKey = subject?.id || `subject-${state.activeSubjectIndex}`;
+      const lessonKey = lesson?.id || `lesson-${state.activeLessonIndex}`;
+      const poolKey = state.onlyWrongPool ? "review" : state.onlyMasteredPool ? "mastered" : "all";
+      return `${subjectKey}__${lessonKey}__${mode}__${poolKey}`;
+    }
+
+    function cloneWordListForSnapshot(list) {
+      return Array.isArray(list) ? list.map(word => ({ ...word })) : [];
+    }
+
+    function saveStudyModeSnapshot(mode = state.mode) {
+      if (!state.studyModeSnapshots || typeof state.studyModeSnapshots !== "object") state.studyModeSnapshots = {};
+      state.studyModeSnapshots[getStudySnapshotKey(mode)] = {
+        quizOrder: cloneWordListForSnapshot(state.quizOrder),
+        currentIndex: state.currentIndex,
+        currentOptions: Array.isArray(state.currentOptions) ? [...state.currentOptions] : [],
+        answer: state.answer,
+        selectedChoice: state.selectedChoice,
+        feedback: state.feedback ? { ...state.feedback } : null,
+        score: state.score,
+        completed: state.completed,
+        sessionRemovedKeys: Array.isArray(state.sessionRemovedKeys) ? [...state.sessionRemovedKeys] : [],
+        sessionDisplayIndex: state.sessionDisplayIndex,
+        sessionTotal: state.sessionTotal,
+        flashcardFlipped: state.flashcardFlipped,
+      };
+    }
+
+    function restoreStudyModeSnapshot(mode = state.mode) {
+      const snapshot = state.studyModeSnapshots?.[getStudySnapshotKey(mode)];
+      if (!snapshot || !Array.isArray(snapshot.quizOrder) || !snapshot.quizOrder.length) return false;
+      state.quizOrder = cloneWordListForSnapshot(snapshot.quizOrder);
+      state.currentIndex = Math.min(Math.max(Number(snapshot.currentIndex) || 0, 0), Math.max(state.quizOrder.length - 1, 0));
+      state.currentOptions = Array.isArray(snapshot.currentOptions) ? [...snapshot.currentOptions] : [];
+      state.answer = String(snapshot.answer || "");
+      state.selectedChoice = String(snapshot.selectedChoice || "");
+      state.feedback = snapshot.feedback ? { ...snapshot.feedback } : null;
+      state.score = Number(snapshot.score) || 0;
+      state.completed = Number(snapshot.completed) || 0;
+      state.sessionRemovedKeys = Array.isArray(snapshot.sessionRemovedKeys) ? [...snapshot.sessionRemovedKeys] : [];
+      state.sessionDisplayIndex = Number(snapshot.sessionDisplayIndex) || 0;
+      state.sessionTotal = Number(snapshot.sessionTotal) || state.quizOrder.length;
+      state.flashcardFlipped = !!snapshot.flashcardFlipped;
+      if (["multiple-ko-vi", "multiple-vi-ko", "listen-choice"].includes(mode) && !state.currentOptions.length) {
+        state.currentOptions = buildOptionsForCurrent(getCurrent());
+      }
+      return true;
+    }
+
+    function switchStudyMode(nextMode) {
+      if (!nextMode || nextMode === state.mode) return;
+      saveStudyModeSnapshot(state.mode);
+      state.mode = nextMode;
+      hideError();
+      const restored = restoreStudyModeSnapshot(nextMode);
+      if (!restored) resetQuiz();
+      else {
+        saveState();
+        render();
+      }
+    }
+
     function resetQuiz() {
       const source = buildQuizSource();
       // Giữ đúng thứ tự từ vựng như trong bài. Chỉ xáo trộn khi người dùng bấm nút “Trộn”.
@@ -6904,7 +6975,7 @@ body {
       }
       playFeedbackSound(correct);
       render();
-      if ((state.mode === "multiple-ko-vi" || state.mode === "multiple-vi-ko" || state.mode === "listen-choice") && current?.vocab) {
+      if (["multiple-ko-vi", "multiple-vi-ko", "listen-choice", "typing", "listening", "listen-type"].includes(state.mode) && current?.vocab) {
         setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 120);
       }
     }
@@ -6973,7 +7044,7 @@ body {
       } else {
         state.currentOptions = [];
       }
-      if (state.mode === "listening" && current) {
+      if (["listening", "listen-type", "listen-choice"].includes(state.mode) && current) {
         setTimeout(() => speakKorean(current.vocab, Number(state.listeningRate)), 160);
       }
       render();
@@ -7279,6 +7350,7 @@ body {
     }
 
     function selectSection(section) {
+      if (state.appSection === "study") saveStudyModeSnapshot(state.mode);
       state.appSection = section;
       if (section === "play") {
         if (state.playMode === "true-false" && !state.judgeCurrent) initJudgeGame();
@@ -8000,9 +8072,7 @@ body {
     });
     document.querySelectorAll("#modeTabs button").forEach(btn => {
       btn.addEventListener("click", () => {
-        state.mode = btn.dataset.mode;
-        state.currentOptions = [];
-        resetQuiz();
+        switchStudyMode(btn.dataset.mode);
       });
     });
     document.querySelectorAll("#sectionPills .mode-pill").forEach(btn => {
@@ -8157,6 +8227,9 @@ body {
       toggleReviewWord,
       markWordMastered,
       selectChoice,
+      switchStudyMode,
+      saveStudyModeSnapshot,
+      restoreStudyModeSnapshot,
       handleSubmit,
       handleNext,
       handlePrevious,
