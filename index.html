@@ -5314,11 +5314,11 @@ body {
       const wasManualReview = isManualReviewWord(word);
       if (wasManualReview) removeWordFrom("reviewWords", word);
       else upsertWordInto("reviewWords", word, { markedAt: new Date().toISOString(), source: "manual" });
+      sanitizeReviewLists();
       saveState();
 
-      // Khi đang học danh sách cần ôn, nếu bỏ đánh dấu thì loại ngay khỏi hàng đợi.
-      // Nếu chỉ đánh dấu thêm, tự nhảy sang từ kế tiếp để không bị đứng ở cùng một từ.
-      advanceAfterReviewAction(word, { removeFromQueue: false, skipThisTurn: true });
+      // Chỉ cập nhật trạng thái nút/cờ, không tự chuyển sang từ tiếp theo.
+      render();
     }
 
     function markWordMastered(word = getCurrent()) {
@@ -6906,6 +6906,24 @@ body {
         showError("Vui lòng nhập đủ từ tiếng Hàn và nghĩa tiếng Việt.");
         return;
       }
+
+      const duplicatedWord = (Array.isArray(lesson.words) ? lesson.words : [])
+        .find(item => normalizeText(item?.vocab) === normalizeText(cleanedVocab));
+      if (duplicatedWord) {
+        showError(`Từ "${cleanedVocab}" đã có trong bài này. Không thêm trùng từ.`);
+        state.wordFormOpen = true;
+        renderPanels();
+        requestAnimationFrame(() => {
+          const vocabInput = document.getElementById("quickAddVocab");
+          if (vocabInput) {
+            vocabInput.focus();
+            vocabInput.select();
+          }
+        });
+        return;
+      }
+
+      hideError();
       lesson.words.unshift(createWord(cleanedVocab, cleanedMeaning));
       saveState();
       state.wordFormOpen = true;
@@ -7530,13 +7548,13 @@ body {
 
           <div class="question-head-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe lại</button>
-            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>${isManualReviewWord(current) ? "✓ Đã đánh dấu ôn" : "📌 Đánh dấu cần ôn"}</button>
+            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>${isManualReviewWord(current) ? "✓ Đã đánh dấu ôn" : "🚩 Đánh dấu cần ôn"}</button>
             <button class="btn btn-outline" onclick='markWordMastered(${JSON.stringify(current)})'>✅ Đã thuộc</button>
             <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
           </div>
           <div class="question-review-line">
             ${isWrongWord(current) ? `<span class="study-pill">⚠️ Từng chọn sai</span>` : ``}
-            ${isManualReviewWord(current) ? `<span class="study-pill">📌 Bạn đã đánh dấu cần ôn</span>` : ``}
+            ${isManualReviewWord(current) ? `<span class="study-pill">🚩 Bạn đã đánh dấu cần ôn</span>` : ``}
           </div>
       `;
 
@@ -7579,7 +7597,7 @@ body {
           <div class="flashcard-actions">
             <button class="btn btn-outline" onclick='speakKorean(${JSON.stringify(current.vocab)}, Number(state.listeningRate))'>🔊 Nghe từ</button>
             <button class="btn btn-primary" onclick="toggleFlashcard()">🔄 Lật thẻ</button>
-            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>📌 Cần ôn</button>
+            <button class="btn btn-outline review-btn ${isManualReviewWord(current) ? "active" : ""}" onclick='toggleReviewWord(${JSON.stringify(current)})'>🚩 Cần ôn</button>
             <button class="btn btn-outline" onclick='markWordMastered(${JSON.stringify(current)})'>✅ Đã thuộc</button>
             <button class="btn btn-outline" onclick="openCurrentLessonVocab()">📚 Xem từ vựng bài này</button>
           </div>
@@ -7668,7 +7686,7 @@ body {
                     <button class="btn btn-outline" onclick="cancelInlineEdit()">Hủy</button>
                   </div>
                 </div>` : `
-                <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""} ${needsReview ? `<span class="review-badge">📌 cần ôn</span>` : ""}</div>
+                <div class="word-vocab">${escapeHtml(w.vocab)} ${state.favorites.includes(w.vocab) ? "⭐" : ""} ${needsReview ? `<span class="review-badge">🚩 cần ôn</span>` : ""}</div>
                 <div class="word-meaning">${escapeHtml(w.meaning)}</div>
                 <div class="word-study-meta">
                   ${wrongItem ? `<span class="study-pill">Sai ${Number(wrongItem.wrongCount || 1)} lần</span>` : ``}
@@ -7677,7 +7695,7 @@ body {
             </div>
             <div class="word-actions">
               <button class="btn btn-ghost" title="Yêu thích" onclick='toggleFavorite(${JSON.stringify(w.vocab)})'>⭐</button>
-              <button class="btn btn-ghost review-btn ${isManualReviewWord(w) ? "active" : ""}" title="Đánh dấu cần ôn" onclick='toggleReviewWord(${JSON.stringify(w)})'>📌</button>
+              <button class="btn btn-ghost review-btn ${isManualReviewWord(w) ? "active" : ""}" title="Đánh dấu cần ôn" onclick='toggleReviewWord(${JSON.stringify(w)})'>🚩</button>
               <button class="btn btn-ghost" title="Bỏ khỏi danh sách cần ôn" onclick='markWordMastered(${JSON.stringify(w)})'>✅</button>
               <button class="btn btn-ghost" title="Nghe phát âm" onclick='speakKorean(${JSON.stringify(w.vocab)}, Number(state.listeningRate))'>🔊</button>
               <button class="btn btn-ghost" onclick='editWord(${JSON.stringify(w.id)})'>✏️</button>
